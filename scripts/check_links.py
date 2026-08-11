@@ -17,8 +17,8 @@
     python3 scripts/check_links.py --verify-media  # ★原本を全数照合（新規ダウンロード時）
 
 ★原本を今から用意する／ダウンロードした場合は `--verify-media` を必ず通すこと。
-  素材DBが**そのまま在庫表**になっている（188クリップの名前と尺を持っている）ので、
-  別のマニフェストを用意しなくても「落とし切れているか」を機械照合できる。
+  同梱の在庫表 media_manifest.json（188クリップの名前と実尺）と突合して
+  「落とし切れているか」を機械照合できる。
   Google Drive からの取得では **268本と出るが実際は315本** という取りこぼしを実際に踏んでいる
   （HANDBOOK 1節）。★**落とし切れていないのに落とし切れたように見える**のが怖いところ。
 
@@ -166,26 +166,20 @@ def check_prereq(tokens, fix_dirs, skip_fonts):
     return ng
 
 
-ASSET_DB = os.path.join(KIT_ROOT, "data/asset_db/feriest_0801-0805_windows.sqlite")
+MANIFEST = os.path.join(KIT_ROOT, "data/asset_db/media_manifest.json")
 DUR_TOL = 0.10   # 秒。DBの max(t1) と実尺の許容差（実測は12本抽出で全て 0.00 差）
 
 
 def _expected_clips():
-    """素材DBから「商材ごとにあるべきクリップ名と尺」を復元する。
+    """在庫表 media_manifest.json から「商材ごとにあるべきクリップ名と尺」を引く。
 
-    key は "<product>_<clipname>" 形式。max(t1) が素材の実尺と一致することを実測で確認済み
-    （12本抽出で全て差 0.00秒）。★つまりDBがそのまま在庫表兼チェックサムになる。
-    `_dup_` 付きの product は集計から除外する（ASSETS.md / project.base.json）。
+    尺は素材解析時の実測で、原本の実尺と一致することを確認済み（12本抽出で全て差 0.00秒）。
+    ★在庫表がそのままチェックサムになる。
     """
-    import sqlite3
-    c = sqlite3.connect(ASSET_DB)
+    m = json.load(open(MANIFEST, encoding="utf-8"))
     out = {}
-    for prod, key, t1 in c.execute(
-            "SELECT product, key, MAX(t1) FROM asset_windows_v2 "
-            "WHERE product NOT LIKE '%_dup_%' GROUP BY product, key"):
-        if not key.startswith(prod + "_"):
-            continue
-        out.setdefault(prod, {})[_nfc(key[len(prod) + 1:])] = t1
+    for prod, v in m["products"].items():
+        out[prod] = {_nfc(clip): dur for clip, dur in v["clips"].items()}
     return out
 
 
@@ -202,8 +196,8 @@ def verify_media(tokens, want):
     """原本を全数照合する。名前の欠け／余りと、尺のズレ（＝途中で切れた・取り違え）を出す。"""
     from concurrent.futures import ThreadPoolExecutor
 
-    if not os.path.exists(ASSET_DB):
-        print("  NG  素材DBが無い: %s" % ASSET_DB)
+    if not os.path.exists(MANIFEST):
+        print("  NG  在庫表が無い: %s" % MANIFEST)
         return 1
     if not shutil.which("ffprobe"):
         print("  NG  ffprobe が無いので尺を検査できない")
@@ -211,7 +205,7 @@ def verify_media(tokens, want):
 
     exp = _expected_clips()
     ng = 0
-    print("\n== 原本の全数照合（素材DBと突合）==")
+    print("\n== 原本の全数照合（在庫表と突合）==")
 
     for path in sorted(glob.glob(os.path.join(KIT_ROOT, "projects", "*.json"))):
         proj = json.load(open(path, encoding="utf-8"))
@@ -219,7 +213,7 @@ def verify_media(tokens, want):
         if want and vid not in want:
             continue
         if prod not in exp:
-            print("  NG  %s  素材DBに product が無い: %s" % (vid, prod))
+            print("  NG  %s  在庫表に product が無い: %s" % (vid, prod))
             ng += 1
             continue
 

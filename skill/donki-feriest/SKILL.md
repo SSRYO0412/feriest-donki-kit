@@ -1,6 +1,6 @@
 ---
 name: donki-feriest
-description: "ドン・キホーテ（株式会社PPIH）向け商品紹介ショート動画『Feriest』案件の専用スキル。この案件の恒久ルール・参考動画『0.7人前うどん』の全実測値・テロップの3階層の文法・Premiereの組み方・踏んだ罠を持つ。次のときに必ず使う: 『ドンキ』『ドン・キホーテ』『PPIH』『Feriest』『海老ドーン』『0801』『0802』『トロリスタ』『Reebokベスト』『ライブマイク』『Mii+』『ド情熱スプレー』『星が見えるカーテン』『うどん参考』と言われたとき。素材DBの窓を引くとき。修正台帳の修正指示に対応するとき。この案件のPremiereプロジェクトを触るとき。汎用の video-ops / short-video-pipeline より先にこれを読む。"
+description: "ドン・キホーテ（株式会社PPIH）向け商品紹介ショート動画『Feriest』案件の専用スキル。この案件の恒久ルール・参考動画『0.7人前うどん』の全実測値・テロップの3階層の文法・Premiereの組み方・踏んだ罠を持つ。次のときに必ず使う: 『ドンキ』『ドン・キホーテ』『PPIH』『Feriest』『海老ドーン』『0801』『0802』『トロリスタ』『Reebokベスト』『ライブマイク』『Mii+』『ド情熱スプレー』『星が見えるカーテン』『うどん参考』と言われたとき。素材の候補を引くとき。修正台帳の修正指示に対応するとき。この案件のPremiereプロジェクトを触るとき。汎用の video-ops / short-video-pipeline より先にこれを読む。"
 user-invokable: true
 ---
 
@@ -34,7 +34,7 @@ user-invokable: true
 | `references/TELOP-SPEC.md` | テロップの3階層の文法・色・ΔRGBの基準・`縦位置`の意味・書体の入手可否 |
 | `references/PREMIERE-RECIPE.md` | 0801の組み方（トラック構成・MOGRT・縦型SEQ生成・カットの共通設定・全パラメータ） |
 | `references/TRAPS.md` | Premiere API 13件・測定器の盲点6件・運用4件 |
-| `references/ASSETS.md` | 素材DBの引き方・窓のスキーマ・素材の罠 |
+| `references/ASSETS.md` | 素材の引き方（在庫表・候補リスト・実測での裏取り）・素材の罠 |
 | `references/MINIMAL-SET.md` | ★**別マシンで動かすのに要るもの一覧**・CEP拡張の導入手順 |
 | `assets/telop_3slot_v22.mogrt` | テロップの正本テンプレ（★v20は使わない） |
 | `assets/1f447.png` / `1f364.png` | 👇 と 🍤（Twemoji 72×72） |

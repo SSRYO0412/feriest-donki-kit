@@ -8,7 +8,7 @@
   python3 .fork/gen_projects.py          # 生成
   python3 .fork/gen_projects.py --check  # 既存と一致するか検算（差分があれば非0で終了）
 """
-import json, os, sqlite3, sys, collections
+import json, os, sys, collections
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def p(*a): return os.path.join(ROOT, *a)
@@ -63,14 +63,10 @@ BUILT = {
 }
 
 def db_counts():
-    con = sqlite3.connect(p(BASE["source"]["asset_db"]))
-    out = {}
-    for prod, n_win, n_key in con.execute(
-            "select product, count(*), count(distinct key) from asset_windows_v2 "
-            "where product not like '%_dup_%' group by 1"):
-        out[prod] = (n_win, n_key)
-    con.close()
-    return out
+    """在庫表 media_manifest.json から (窓集計, クリップ数) を引く。
+    ★窓単位の解析データは配布物に含めない方針（.fork/gen_manifest.py）。ここは集計値のみ。"""
+    m = json.load(open(p(BASE["source"]["manifest"])))
+    return {prod: (v["n_windows"], len(v["clips"])) for prod, v in m["products"].items()}
 
 def main():
     check = "--check" in sys.argv

@@ -40,7 +40,7 @@
   03_render/premiere_202608/ ← 書き出し（同上）
 ```
 
-商材フォルダ名は素材DBの `product` と**一字一句一致**する必要があります
+商材フォルダ名は在庫表（media_manifest.json）の `product` と**一字一句一致**する必要があります
 （半角スペースや読点まで。例 `Mii +フレグランスオイル、ロックミルク`）。
 違う場合は手順5の検査が `NG` を出すので、名前を合わせるか
 `.feriest-paths` で `FERIEST_ROOT` を調整してください。
@@ -181,11 +181,11 @@ python3 scripts/check_links.py --verify-media  # ★原本を全数照合（新�
 
 ### ★原本を今から用意する／ダウンロードした場合は `--verify-media`
 
-同梱の素材DBが**そのまま在庫表**になっています（188クリップの名前と尺を持っている）。
-別途マニフェストを用意しなくても、落とし切れているかを機械照合できます。**188本で約3秒**です。
+同梱の在庫表 **`data/asset_db/media_manifest.json`**（188クリップの名前と実尺）と突合して、
+落とし切れているかを機械照合できます。**188本で約3秒**です。
 
 ```
-== 原本の全数照合（素材DBと突合）==
+== 原本の全数照合（在庫表と突合）==
   OK  0801  海老ドーン贅沢ぷりぷり海老マヨピザ          24/24本 照合
   OK  0802  ド情熱逆さで使える消臭スプレー&速乾防水スプレー   36/36本 照合
    …
@@ -306,31 +306,32 @@ python3 scripts/calibration_harness.py score --out qc/calibration
 | `TELOP-SPEC.md` | テロップの3階層の文法 |
 | `PREMIERE-RECIPE.md` | Premiere の組み方（コード付き）|
 | `TRAPS.md` | 踏んだ罠（API 18件・測定器の盲点7件・素材6件・選定5件・運用6件）|
-| `ASSETS.md` | ★**素材DBの引き方**・窓のスキーマ |
+| `ASSETS.md` | ★**素材の引き方**（在庫表・候補リスト・実測での裏取り）|
 | `PROJECT-RULES.md` / `MINIMAL-SET.md` | 案件ルール・最小セット |
 
 ---
 
-## 9. 素材の探し方（★DBのラベルを信用しない）
+## 9. 素材の探し方（★ラベルを信用しない・実測主義）
 
-同梱の素材DB **`data/asset_db/feriest_0801-0805_windows.sqlite`** を引きます。
-**1素材×時間窓 = 1行**で、3,774窓 / 189クリップ / 71列。引き方は `ASSETS.md` の3節に実例があります。
+★このキットには**窓単位の素材解析データは同梱されていません**。入っているのは
+①在庫表 `data/asset_db/media_manifest.json`（検収用）と
+②**選抜済みの候補リスト** `data/design/s34_FINAL3.json`（5商材×6スロット・候補562件）です。
+引き方と実素材での裏取り手順は `ASSETS.md` に実例があります。
 
 ```bash
-DB="data/asset_db/feriest_0801-0805_windows.sqlite"
-sqlite3 -header -column "$DB" "
-SELECT win, dur, bright_med, white_max, sharp_med, shot_size, substr(action,1,40)
-FROM asset_windows_v2
-WHERE key LIKE '海老ドーン%' AND white_max<0.05 AND dur>=1.85
-ORDER BY sharp_med DESC LIMIT 15;"
+python3 - <<'EOF'
+import json
+d = json.load(open("data/design/s34_FINAL3.json"))
+for s in d["products"]["海老ドーン贅沢ぷりぷり海老マヨピザ"]["slots"]:
+    print(s["slot"], "|", s["telop"], "| 候補", len(s["candidates"]))
+EOF
 ```
 
 ★守ること（`ASSETS.md` と `PROJECT-RULES.md` から）:
 
-- **選定の主キーは `action`**（何をしているか）。`inventory` は照合に使わない（偽陽性を量産する）
-- **`person_count` は実画と食い違うことがある**。必ず目視で裏を取る
-- **DBの数値は目安。最終判断は実素材を測る**
-- `product` の `_dup_1Z5Zs0` 付き12窓は集計から除外する
+- **選定の主キーは「何をしているか」**（動作・機能）。写っている物の列挙で照合しない（偽陽性を量産する）
+- **候補のラベルは実画と食い違うことがある**。採用前に必ず実画を目視で裏を取る
+- **候補リストの数値は目安。最終判断は実素材を ffprobe/ffmpeg で測る**
 - **向き** — 原本は全て 3840×2160 で返るが、229本は rotation メタで実体は縦。
   真に横なのは5本だけ（a0947 / a0950 / a0951 / a0803 / **a0933**）
 - **連番が商品をまたぐ**。★**フォルダ名の商品帰属を信用しない**

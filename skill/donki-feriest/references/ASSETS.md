@@ -1,145 +1,91 @@
-# 素材と素材DBの引き方
+# 素材の引き方
+
+> ★このキットには**窓単位の素材解析データ（DB）は同梱していません**。
+> 配布物に入っているのは ①在庫表（検収用の最小情報）と ②スロット別の候補リスト（選抜済み）です。
+> 追加の判断が要るときは**実素材を ffprobe/ffmpeg で都度測り、実画を目視**します——
+> これはこの案件の原則（実測主義・ラベルを信用しない）と同じ考え方です。
 
 ---
 
-## 1. 素材DBの場所
+## 1. 同梱物
 
-**キット同梱**: `data/asset_db/feriest_0801-0805_windows.sqlite`（テーブル `asset_windows_v2` / 3,774窓）
+| ファイル | 中身 | 用途 |
+|---|---|---|
+| `data/asset_db/media_manifest.json` | **在庫表**。5商材 188クリップの名前と実尺（秒）＋窓数の集計 | `check_links.py --verify-media` の検収・件数検算 |
+| `data/design/s34_FINAL3.json` | ★**スロット別の候補リスト（選抜済み）**。5商材 × 6スロット・候補 **562件**。各候補に `t0/t1/dur/shot/comp/quality/blur/persons/matched` | 0802〜0805 の選定の出発点 |
+| `data/conte/conte.json` | 字コンテ45スロット（`need` = must+want の被写体要求つき） | 何を探すかの正 |
 
-元になった全案件DB（キットには入っていない）: `@@FERIEST_ROOT@@/01_assets/db_202608/feriest_202608_v5_fix.sqlite`
+### 在庫の内訳（media_manifest.json の実測値）
 
-★**v5_fix が正本**。v1〜v4 は工程途中の版（残してあるが使わない）。
-
-| テーブル | 中身（★同梱DBの実測値 2026-08-11） |
-|---|---|
-| `asset_windows_v2` | **1素材×時間窓 = 1行**。**3,774 窓** / 189クリップ / **71列** |
-| `persons` | 人物レジストリ 3,377行 |
-
-★下の「4. 素材の内訳」は**全案件DB（4,658窓/234クリップ）**の数字。
-同梱DBは 0801〜0805 の5商材だけなので、トロリスタ・アプリクーポン・ホイールグローブは入っていない。
-
-| product | クリップ | 窓 |
+| product | クリップ | 窓（集計） |
 |---|---|---|
 | Mii +フレグランスオイル、ロックミルク | 47 | 1,307 |
 | Reebokファン付きベスト | 46 | 803 |
 | おうちでライブマイク | 35 | 793 |
 | ド情熱逆さで使える消臭スプレー&速乾防水スプレー | 36 | 430 |
 | 海老ドーン贅沢ぷりぷり海老マヨピザ | 24 | 429 |
-| （★除外して数える）`..._dup_1Z5Zs0` | 1 | 12 |
 
-## 2. 窓のスキーマ（71列・よく使うもの）
+トロリスタ・アプリクーポン・ホイールグローブは**対象外**（字コンテ未着 or 恒久放置）。
 
-| 列 | 中身 |
-|---|---|
-| `win` | `<商材>_<クリップ>#w0001` 形式の主キー |
-| `key` | クリップ名（`海老ドーン贅沢ぷりぷり海老マヨピザ_20260803_honma_a0920`） |
-| `win_id` / `t0` / `t1` / `dur` | 窓の番号と素材内の秒 |
-| `shot_size` | `extreme_close` / `close` / `medium` / `wide` |
-| `composition` | `hero` / `good` / `cramped` / `cut_off` / `no_subject` |
-| `action` | ★**何をしているか**（選定の主キーはここ） |
-| `semantic_tags` / `inventory` | 写っているもの。★`inventory` は照合に使わない（偽陽性を量産する） |
-| `person_count` | ★**実画と食い違うことがある**。必ず目視で裏を取る |
-| `bright_med` / `white_max` / `dark_max` | 輝度・白飛び・黒つぶれ |
-| `sharp_med` / `sharp_min` | 精細度（高いほど良い） |
-| `shift_med/p95/max` | 平行移動量（カメラの動き） |
-| `dcam_med/p95/max` | カメラ動作量 |
-| `mov_area_med/max` / `flow_std_med` | 動きの面積・オプティカルフロー |
-| `verdict` / `verdict_reason` / `flags` | 判定 |
-| `crop_potential` / `subject_cut_off` / `blur_or_shake` / `freeze` | 品質フラグ |
-
-## 3. 引き方の例
+## 2. 候補の引き方（s34_FINAL3.json）
 
 ```bash
-DB="data/asset_db/feriest_0801-0805_windows.sqlite"   # キット同梱（テーブルは asset_windows_v2）
-
-# 商材の全窓を一覧化（★選定前に必ず全部読む）
-sqlite3 -separator '|' "$DB" "
-SELECT replace(win,'海老ドーン贅沢ぷりぷり海老マヨピザ_','')||'',
-       printf('%5.2f-%5.2f',t0,t1), printf('%4.2f',dur), shot_size, composition,
-       printf('%3.0f',bright_med), printf('%5.3f',white_max), printf('%4.0f',sharp_med),
-       person_count, substr(action,1,70)
-FROM asset_windows_v2 WHERE key LIKE '海老ドーン%' AND dur>=0.5
-ORDER BY key, win_id;"
-
-# 白飛びが少なく精細な候補
-sqlite3 -header -column "$DB" "
-SELECT win, dur, bright_med, white_max, sharp_med, shot_size, substr(action,1,40)
-FROM asset_windows_v2
-WHERE key LIKE '海老ドーン%' AND white_max<0.05 AND dur>=1.85
-ORDER BY sharp_med DESC LIMIT 15;"
-
-# カメラの動きが大きい窓
-sqlite3 -header -column "$DB" "
-SELECT win, dur, shift_p95, dcam_p95, shot_size, substr(action,1,40)
-FROM asset_windows_v2 WHERE key LIKE '海老ドーン%' AND dur>=1.85
-ORDER BY shift_p95 DESC LIMIT 10;"
+python3 - <<'PY'
+import json
+d = json.load(open("data/design/s34_FINAL3.json"))
+p = d["products"]["おうちでライブマイク"]
+for s in p["slots"]:
+    print(s["slot"], s["function"], "|", s["telop"], "|",
+          "%.2f秒" % s["dur_est"], "候補", len(s["candidates"]))
+    for c in s["candidates"][:3]:
+        print("   ", c["id"], c.get("shot"), c.get("comp"), "|", (c.get("action") or "")[:40])
+PY
 ```
 
-★**DBの数値は目安。最終判断は実素材を測る。**
-カメラの動きは本番と同じクロップでフレーム間差を実測した方が正確:
+- 候補IDの `key#w0013-w0014` は**連続窓の範囲表記**（562件中416件）。`t0/t1` が実時刻
+- `__NO_INSERT__` は**「置かない」という選択肢**。★これも必ず候補に入れる（恒久ルール）
+- s34 は自分でこう宣言している: **「候補列挙とスコアまで。採否は人の原寸目視で決める」**
+
+## 3. 追加の探索・裏取り（★実測主義）
+
+候補リストの外を探したいとき・候補の実態を確かめるときは、**実素材を直接測る**。
 
 ```bash
-ffmpeg -hide_banner -v error -ss <tin> -t <dur> -i <src> \
-  -vf "scale=-2:1920,crop=1080:1920,scale=160:284,format=gray" -f rawvideo - \
-  | python3 -c "import sys,numpy as np; W,H=160,284; d=sys.stdin.buffer.read(); \
-    n=len(d)//(W*H); f=np.frombuffer(d[:n*W*H],dtype=np.uint8).reshape(n,H,W).astype(float); \
-    dd=np.abs(np.diff(f,axis=0)).mean(axis=(1,2)); print(f'平均{dd.mean():.2f} 最大{dd.max():.2f}')"
+SRC="$FERIEST_ROOT/00_source_drive/20260807_新素材_8月掲載分/海老ドーン贅沢ぷりぷり海老マヨピザ"
+
+# 尺・回転メタ・解像度
+ffprobe -v error -select_streams v:0 \
+  -show_entries stream=width,height:stream_side_data=rotation:format=duration \
+  -of json "$SRC/20260803_honma_a0920.MP4"
+
+# 区間を実画で見る（0.5秒刻みのサムネ列を出して Read で1枚ずつ目視）
+ffmpeg -v error -ss 2.0 -to 3.1 -i "$SRC/20260803_honma_a0920.MP4" \
+  -vf fps=2,scale=480:-2 /tmp/probe_%02d.jpg
+
+# 白飛び率（輝度≥250の画素比。★絶対値でなく他カットとの相対で見る）
+# → scripts/reference_match.py の G90-9 と同じ測り方
 ```
 
-**実測の目安（海老ドーンの素材）**: 静止 0.56 ／ なめるような移動 8.18 ／ 最大 12.73
+★**候補に挙がった窓は、採用前に必ず実画を目視する。** ラベル（`persons` / `action` / 分類）と
+実画は食い違うことがある——実際に `person_count=0` の窓に素手の指が写っていた（他は全て黒手袋）。
 
-## 4. 素材の内訳
+## 4. ★素材の既知の罠（すべて実際に踏んだ）
 
-| 商材 | 本数 | 尺 | 窓 |
-|---|---|---|---|
-| Mii + フレグランスオイル | 47 | 24.4分 | 1,307 |
-| Reebok ファン付きベスト | 46 | 18.2分 | 803 |
-| ド情熱 消臭＆防水スプレー | 36 | 10.3分 | 430 |
-| おうちでライブマイク | 35 | 19.1分 | 793 |
-| **海老ドーン** | **24** | **9.9分** | **429** |
-| トロリスタ | 22 | 7.9分 | 372 |
-| アプリクーポン（★放置） | 15 | 7.5分 | 427 |
-| ホイールグローブ | 8 | 1.9分 | 85 |
-| **計** | **234** | **99.4分** | **4,658** |
-
-**海老ドーンの範囲**: `20260803_honma_a0920`〜`a0933` ＋ `IMG_2848`〜`IMG_2858`
-
-## 5. 素材の原本
-
-`$FERIEST_ROOT/00_source_drive/20260807_新素材_8月掲載分/<商材フォルダ>/`
-
-★手元の原本が引けるかは `python3 scripts/check_links.py` で検査する。
-
-★**読み取り専用。絶対に編集しない。**
-★プロキシ（`01_assets/db_202608/proxy/`）で**書き出さない**。実測も原本で行う。
-
-## 6. その他の成果物（全てSSD内）
-
-| | 場所 |
+| 罠 | 中身 |
 |---|---|
-| 構成設計（5商材30スロットの割付） | `01_assets/db_202608/s34_FINAL3.json`（★現在の採用） |
-| スロット採点の履歴 | `01_assets/db_202608/s1_slot_score_v1〜v6.json` / `s34_select_v1〜v10.json` |
-| 参考の様式プロファイル | `01_assets/db_202608/ref_style_profile_v1.json` / `ref_machine_v1/` |
-| 参考分析の所見 | `02_work/ref_analysis/KIMO.md` |
-| コンタクトシート | `01_assets/db_202608/sheets/` |
-| 抽出フレーム | `01_assets/db_202608/frames/` |
-| 動き解析 | `01_assets/db_202608/motion_v3_202608/` |
-| 字コンテとの突合 | `01_assets/db_202608/conte_match_v3/` |
-| 素材不足の対処案 | `01_assets/db_202608/no_material_plan_v1.md` |
-| 7月納品分（参考様式DB） | `01_assets/db_202608/feriest_ref50_v1.sqlite` |
-| DB化計画（罠の記録つき） | `05_docs/20260807_新素材_DB化計画.md` |
-| カーテン工程の学び | `02_work/LEARNINGS_feriest_20260803.md` |
-| テロップ工程の学び | `02_work/LEARNINGS_feriest_telop_20260803.md` |
+| **向き** | 原本は全て 3840×2160 で返るが、**大半に rotation メタがあり実体は縦**。probe の w/h だけで判定すると全数「横」になる。真に横なのは5本（a0947 / a0950 / a0951 / a0803 / **a0933**）|
+| **連番が商品をまたぐ** | `20260803_honma_a08xx.MP4` はフォルダ分けが撮影順と一致していない。★**フォルダ名の商品帰属を信用しない**（在庫表の product が正）|
+| **ラベルと実画の食い違い** | 上記 §3。候補の実画目視は省略不可 |
+| **選定の主キーは「何をしているか」** | 写っている物の列挙（inventory 的な情報）で照合すると偽陽性を量産する。動作・機能で選ぶ |
+| **NFD 問題** | 日本語ファイル名は NFC/NFD の差で `os.path.exists` が False になることがある。`unicodedata.normalize` か glob で拾う |
+| **`._*` AppleDouble** | 解析・列挙時は `-not -name "._*"` で除外 |
 
-## 7. ★SSDに無いもの（マシン側に必要）
+## 5. 検収（原本を新しく用意したとき）
 
-| | 手当て |
-|---|---|
-| MOGRT `telop_3slot_v22.mogrt` | ★このスキルの `assets/` に**同梱済み**。本来は video-ops-framework 側 |
-| Twemoji `1f447.png` / `1f364.png` | ★このスキルの `assets/` に**同梱済み** |
-| **CEP Bridge 拡張** | `~/Library/Application Support/Adobe/CEP/extensions/MCPBridgeCEP` を導入する |
-| **フォント** | Adobe Fonts で `mplus-1p-heavy` / `HeiseiMinStd-W9` / `Makinas-4-Square` を有効化 |
-| **video-ops-framework** | `git clone` → `core/ops/scripts/install.sh` |
-| **Codex CLI** | `npm i -g @openai/codex@latest` → `codex login`（敵対レビューに使う） |
+```bash
+python3 scripts/check_links.py --verify-media
+```
 
-**これ以外は全てSSD内にある。**
+在庫表と ffprobe 実測を突合して **欠け／DBに無い余分／尺ズレ（取り違え）／破損** を検出する
+（188本で約3秒・欠陥注入で実証済み）。★Google Drive からの取得は取りこぼしが起きやすい
+（`rclone lsjson -R` が 268本と出るが実際は315本、を実際に踏んだ。HANDBOOK 1節）。
