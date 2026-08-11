@@ -1,6 +1,6 @@
 # 動画・音声制作スキル 横断原則（PRINCIPLES）
 
-> 全ての動画/音声制作スキル（reference-video-clone 系・faceless 系・swap 系・verarus・viral/jp-buzz・audio-emotion-voice-clone）に共通する原則。
+> 全ての動画/音声制作スキル（reference-video-clone 系・faceless 系・swap 系・案件V・viral/jp-buzz・audio-emotion-voice-clone）に共通する原則。
 > 各スキルの SKILL.md に書かれた個別ルールが本書と重複するのは正常（自己完結性のため）。**矛盾したら各スキルの SKILL.md / 専用ルール（例: BEFOREAFTER_RULES.md）が優先**。
 > 正本: `~/.claude/skills/_video-core/PRINCIPLES.md`（各スキルへは sync_core.sh で配布）。
 
@@ -189,7 +189,7 @@ function findByPath(path, bin) {
 
 ---
 
-## §14 SEは「合成音」より「素材に写り込んだ本物」を探す（2026-08-06 楳図ホラーハウス公式PVで確立）
+## §14 SEは「合成音」より「素材に写り込んだ本物」を探す（2026-08-06 楳図案件H公式PVで確立）
 
 ホラー/体験型イベントの動画で、合成SEの「遠い悲鳴」を置いていたところ、
 **撮影素材の中に本物の参加者の悲鳴が録れていた**。差し替えたら効きが桁違いだった。

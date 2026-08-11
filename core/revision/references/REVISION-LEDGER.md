@@ -42,7 +42,7 @@
       └ …（動画の本数ぶん）
 ```
 
-実例（VERARUS official 260730 ab版10本）:
+実例（案件V official 260730 ab版10本）:
 
 ```
 📋 260730 official 修正台帳(0385-0394 ab版)
@@ -71,7 +71,7 @@
 | 条件 | 構成 | 実例 |
 |---|---|---|
 | 商材・構成・選択肢が**動画ごとに違う** | **動画ごとに専用DB**を各ページ内に作る（**既定**） | Feriest（`short_ver_v2 カット台帳` を動画ごとに新規作成） |
-| **同一商材の同一構成バリアント量産**（選択肢が完全に共通） | 1つのDB＋**動画ごとのリンクドビュー**（`video_id` でフィルタ） | VERARUS ab版10本（同じ13カット構成） |
+| **同一商材の同一構成バリアント量産**（選択肢が完全に共通） | 1つのDB＋**動画ごとのリンクドビュー**（`video_id` でフィルタ） | 案件V ab版10本（同じ13カット構成） |
 
 **どちらを採っても「1ページ＝1動画・0秒から時系列・`修正指示` と `採否` を左に」は必ず守る。**
 テンプレの子ページには両方が入っているので、使わない方のブロックを複製後に削除する。
@@ -79,7 +79,7 @@
 ### 3.2 列の構成（統合版）
 
 テンプレの子ページ内DB `<video_id> カット台帳（全<N>カット・0秒から時系列）` が既定のスキーマ。
-VERARUS（受付・履歴が厚い）と Feriest（絵の設計値が厚い）の両方の実運用を統合した31列。
+案件V（受付・履歴が厚い）と Feriest（絵の設計値が厚い）の両方の実運用を統合した31列。
 
 **①キーと時間軸**（起票時に機械が入れる）
 
@@ -276,7 +276,7 @@ ALTIVO_B_08/B_10の使い回し(各3〜4動画で重複)を解消し、0385_01 c
 | 映像管理_素材使用DB | `collection://88a1c8de-a36f-44bd-8eda-0acf5c979429` |
 | 映像管理_レンダーpy管理DB | `collection://c789aeb7-61e0-448f-a9bd-8a61566a069c` |
 | 映像管理_QAログDB | `collection://5ea8dfe9-489b-496d-9b48-49fc8f6fed5d` |
-| 実装の参考（Feriest=専用DB型 / VERARUS=共有DB型） | Feriest https://www.notion.so/green-card/3b08866ade56819796c5c19c5cc109cb ／ VERARUS https://www.notion.so/green-card/3ae8866ade5681768d9af71a50ec3c00 |
+| 実装の参考（Feriest=専用DB型 / 案件V=共有DB型） | Feriest https://www.notion.so/green-card/3b08866ade56819796c5c19c5cc109cb ／ 案件V https://www.notion.so/green-card/3ae8866ade5681768d9af71a50ec3c00 |
 | ローカル側スカフォールド | `core/revision/scripts/new_revision_project.py`（`ledger.md` と作業ディレクトリ） |
 
 ## 8. 修正指示DB との関係
