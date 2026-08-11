@@ -15,7 +15,8 @@
 ## 30秒で確かめる
 
 ```bash
-# 手元の原本と結べているか（別マシンでは最初にここ）
+# 手元の原本と結べているか＋前提ソフトが揃っているか（別マシンでは最初にここ）
+# ★環境構築の全手順は HANDOFF.md にある
 cp .feriest-paths.example .feriest-paths   # FERIEST_ROOT を自分の場所に書き換える
 python3 scripts/check_links.py
 
@@ -36,9 +37,10 @@ python3 scripts/calibration_harness.py mechanical \
 
 ## 読む順番（飛ばさない）
 
+0. ★**`HANDOFF.md`** — **別マシンで始めるならまずここ。** 環境構築から着手前チェックまでの全手順
 1. **`.fork/PROJECT-RULES.md`** — 恒久ルール15条・★合格条件の上書き宣言・作業の型
 2. **`HANDBOOK.md`** — 案件の全体像・★効いた修正の履歴・やってはいけない10箇条
-3. **`SETUP.md`** — Premiere CEP Bridge・フォント・動作確認
+3. **`SETUP.md`** — Premiere CEP Bridge・フォント・動作確認（HANDOFF.md の詳細版）
 4. **`skill/donki-feriest/references/`** — 仕様の正本7本
 5. **`.fork/lenses/lenses.json`** — 独立レビュー12レンズ
 
@@ -48,8 +50,9 @@ python3 scripts/calibration_harness.py mechanical \
 ## 中身
 
 ```
+HANDOFF.md               ★別マシンで始めるまでの全手順（アクセス権〜着手前チェック）
 HANDBOOK.md              案件の全知見（Notionが見られない環境用の正本）
-SETUP.md                 環境構築と動作確認
+SETUP.md                 環境構築と動作確認（HANDOFF.md の詳細版）
 
 .fork/                   ★追記レイヤ（このフォーク固有。ここだけ書き換えてよい）
   PROJECT-RULES.md       恒久ルール・合格条件の上書き宣言

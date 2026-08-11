@@ -7,7 +7,7 @@ var L=[]; function log(s){L.push(String(s));}
 var OUT="@@BRIDGE_DIR@@/ebi_v19.txt";
 var DOC="3ea1839d-a639-48ba-acae-e0d506adfd39";
 var MG="@@KIT_ROOT@@/skill/donki-feriest/assets/telop_3slot_v20.mogrt";
-var EMO="@@FERIEST_ROOT@@/01_assets/0.7人前うどん/0.7人前うどん/0.7人前うどん/1f447.png";
+var EMO="@@KIT_ROOT@@/skill/donki-feriest/assets/1f447.png";
 var TPF=8467200000, TOTAL=337;
 var TXT="海老ドーン 贅沢ぷりぷり海老マヨピザ\n※詳細は　をチェック！";
 var FONT="Makinas-4-Square", SIZE=40, YPOS=81;

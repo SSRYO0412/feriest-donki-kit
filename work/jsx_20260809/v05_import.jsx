@@ -11,8 +11,8 @@ var FILES=[
   "@@FERIEST_ROOT@@/00_source_drive/20260807_新素材_8月掲載分/海老ドーン贅沢ぷりぷり海老マヨピザ/IMG_2848.MOV",
   "@@FERIEST_ROOT@@/00_source_drive/20260807_新素材_8月掲載分/海老ドーン贅沢ぷりぷり海老マヨピザ/IMG_2852.MOV",
   "@@FERIEST_ROOT@@/00_source_drive/20260807_新素材_8月掲載分/海老ドーン贅沢ぷりぷり海老マヨピザ/IMG_2856.MOV",
-  "@@FERIEST_ROOT@@/01_assets/0.7人前うどん/0.7人前うどん/0.7人前うどん/月乗りドンペン.jpg",
-  "@@FERIEST_ROOT@@/01_assets/0.7人前うどん/0.7人前うどん/0.7人前うどん/1f447.png",
+  "@@KIT_ROOT@@/data/reference/月乗りドンペン.jpg",
+  "@@KIT_ROOT@@/skill/donki-feriest/assets/1f447.png",
 ];
 
 var missing=0;

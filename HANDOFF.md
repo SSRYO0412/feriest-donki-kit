@@ -1,0 +1,347 @@
+# HANDOFF — 別マシンでこの案件を始めるまでの全手順
+
+> このファイルだけを上から順にやれば、Feriest（ドン・キホーテ／PPIH）8月掲載分の
+> 編集・修正・検品を開始できる状態になります。所要 30〜60分（うちフォント有効化とダウンロードが大半）。
+> **macOS 専用**（`defaults write` / `ditto` を前提にしています）。
+
+★**この案件で最大の失敗は「案件側の引き継ぎ書を読まずに着手したこと」**でした。
+フォントが既に決まっていたのに「無い」と誤断定して別書体に置き換え、全部やり直しになっています。
+**「無い」「未着手」と判断する前に、案件側が既に決めていないか必ず確認してください。**
+
+---
+
+## 0. 必要なもの（先に揃える）
+
+| | |
+|---|---|
+| **このリポジトリへのアクセス権** | ★**private です。** Collaborator 権限かトークンが要ります |
+| **原本フッテージ** | 227本・約38GB。★リポジトリには入っていません（GitHub の 100MB/ファイル制限のため）|
+| **Premiere Pro 2026** ＋ **Adobe Media Encoder** | CEP拡張の対応は `[14.0, 99.9]` |
+| **Adobe Fonts** の3書体 | 手順3で有効化します |
+| **ffmpeg / ffprobe** | 検品スクリプトが使います |
+| **python3 3.9+** | ★**pip install は不要**。numpy も Pillow も使いません |
+
+**After Effects は不要です。** テロップは完成済み MOGRT テンプレ(v22)を投入するだけです。
+
+### 原本フッテージのフォルダ構成
+
+キットは次の構成を前提にしています。**`FERIEST_ROOT` は `00_source_drive` の親**を指します。
+
+```
+<FERIEST_ROOT>/
+  00_source_drive/
+    20260807_新素材_8月掲載分/
+      海老ドーン贅沢ぷりぷり海老マヨピザ/          ← 0801
+      ド情熱逆さで使える消臭スプレー&速乾防水スプレー/  ← 0802
+      おうちでライブマイク/                      ← 0803
+      Reebokファン付きベスト/                    ← 0804
+      Mii +フレグランスオイル、ロックミルク/        ← 0805
+  02_work/premiere/         ← 作業prproj と 書き出し（無ければ手順5で作る）
+  03_render/premiere_202608/ ← 書き出し（同上）
+```
+
+フォルダ名が違う場合は手順5の検査が `NG` を出すので、名前を合わせるか
+`.feriest-paths` で `FERIEST_ROOT` を調整してください。
+★**`00_source_drive/` は読み取り専用**。ここから直接編集しません。
+
+---
+
+## 1. クローン
+
+```bash
+git clone -b worktree-portable-paths https://github.com/SSRYO0412/feriest-donki-kit.git
+cd feriest-donki-kit
+```
+
+約100MB です。`git clone` が認証エラーになる場合は手順0のアクセス権の問題です。
+
+---
+
+## 2. 原本の場所を教える
+
+```bash
+cp .feriest-paths.example .feriest-paths
+$EDITOR .feriest-paths          # FERIEST_ROOT を自分の原本の場所に書き換える
+python3 scripts/resolve_paths.py   # 何がどこに解決されたかを確認
+```
+
+キットの JSON と 案件 jsx は、マシン依存の絶対パスを**トークン**で持っています。
+
+| トークン | 中身 | 解決元 |
+|---|---|---|
+| `@@FERIEST_ROOT@@` | 原本フッテージの根 | env `FERIEST_ROOT` → `.feriest-paths` → 既定値 |
+| `@@KIT_ROOT@@` | このキットの根 | `pr.sh` の位置から自動導出 |
+| `@@BRIDGE_DIR@@` | ブリッジの受け渡し場所 | env `PR_BRIDGE_DIR`（既定 `/tmp/premiere-mcp-bridge`）|
+| `@@AME_PRESET@@` | 書き出しプリセット | env `AME_PRESET` → `/Applications` から**自動検出** |
+
+`pr.sh` が jsx を投げる直前に実パスへ置換します。未解決なら**投入せずに落ちます**。
+
+★MOGRT・Twemoji・参考prproj は**キット同梱物を参照**します（原本側には要りません）。
+jsx が `FERIEST_ROOT` を要求するのは **原本素材と書き出し先だけ**です。
+
+---
+
+## 3. フォント3種を有効化（★ここを飛ばすと全部やり直しになる）
+
+Adobe Fonts で次を**有効化**します。
+
+| 書体 | 使う場所 |
+|---|---|
+| `mplus-1p-heavy` | 通常テロップ 68.948 / 商品名2行組 |
+| `HeiseiMinStd-W9` | 感嘆・言い切り 109・129 |
+| `Makinas-4-Square`（マキナス 4 Square）| ロックアップ（左下の常時表示）35 |
+
+★**未インストールの書体は Premiere が警告なしに別書体へ差し替えます。**
+気づかないまま別物が出来上がるので、手順5の検査を必ず通してください。
+
+---
+
+## 4. Premiere CEP Bridge を導入
+
+Premiere をスクリプトから操作する拡張です。**キットに同梱済み**なので入手は不要です。
+
+```bash
+# ① 未署名拡張を許可（バージョンで CSXS の番号が変わるのでまとめて）
+defaults write com.adobe.CSXS.12 PlayerDebugMode 1
+defaults write com.adobe.CSXS.11 PlayerDebugMode 1
+defaults write com.adobe.CSXS.10 PlayerDebugMode 1
+
+# ② 拡張を配置（★cp -r ではなく ditto。日本語ファイル名の正規化のため）
+mkdir -p ~/Library/Application\ Support/Adobe/CEP/extensions
+ditto skill/donki-feriest/assets/MCPBridgeCEP \
+      ~/Library/Application\ Support/Adobe/CEP/extensions/MCPBridgeCEP
+```
+
+③ **Premiere Pro を完全終了 → 起動**
+④ `ウィンドウ > 拡張機能 > MCP Bridge (CEP)` を開く
+⑤ Temp Directory を確認（既定 `/tmp/premiere-mcp-bridge`）→ **Save Configuration** → **Start Bridge**
+
+★**Start Bridge は毎セッション手動です。** 押し忘れると `pr.sh` が無応答のままタイムアウトします。
+★**外部からブリッジを再開する手段はありません。** 止まったら人が押すしかないので、
+長い処理の前には生存確認を入れてください。
+
+### 疎通確認
+
+```bash
+cat > /tmp/ping.jsx <<'JSX'
+var f = new File("/tmp/premiere-mcp-bridge/ping.txt");
+f.open("w"); f.write("projects=" + app.projects.numProjects); f.close();
+return "ok";
+JSX
+bash skill/donki-feriest/scripts/pr.sh /tmp/ping.jsx
+cat /tmp/premiere-mcp-bridge/ping.txt
+```
+
+★`pr.sh` の正本は **`skill/donki-feriest/scripts/pr.sh`** です。
+`skills/premiere-bridge-ops/scripts/pr.sh`（framework 由来・編集禁止レイヤ）は
+トークン解決を持たないので、案件 jsx を投げると `@@FERIEST_ROOT@@` が生のまま Premiere に届きます。
+
+---
+
+## 5. 着手前チェック（★ここが OK になるまで Premiere で作業を始めない）
+
+```bash
+python3 scripts/check_links.py            # 素材・前提ソフト・書き出し先をまとめて検査
+python3 scripts/check_links.py --fix-dirs # 足りない書き出し先ディレクトリを作る
+```
+
+見るもの:
+
+- **素材** — 5案件の商材フォルダと、0801 が設計上使う10本の実在
+- **前提** — ffmpeg / ffprobe / Premiere / AMEプリセット / CEP拡張 / PlayerDebugMode / **フォント3種**
+- **書き出し先** — `02_work/premiere/verify_20260809` と `03_render/premiere_202608`
+
+フォント確認に system_profiler を使うので **10秒ほどかかります**（急ぐときは `--no-fonts`）。
+
+★**リンク切れは Premiere 側で無言に起きます**（オフラインクリップとして黙って並ぶ）。
+ここで落としておかないと、組み上げた後に気づくことになります。
+
+---
+
+## 6. 0801（構築済み）を開く場合だけ
+
+★**リポジトリ内の位置のまま prproj を開かないでください。**
+prproj は相対パス（`<RelativePath>` 36件）でメディアを持っていますが、その基準は
+**prproj 自身の位置**です。`work/premiere/` のまま開くと `../../` がキット直下を指し、
+**全クリップがオフラインになります。**
+
+```bash
+cp work/premiere/FERIEST_0801_ebi_v1.prproj "$FERIEST_ROOT/02_work/premiere/"
+```
+
+この位置に置けば `../../00_source_drive/…` が正しく解決され、Premiere が自動で再リンクします。
+
+| | |
+|---|---|
+| シーケンス | `0801_ebi` / **1080×1920 / 30fps / 337F = 11.233秒** |
+| documentID | `3ea1839d-a639-48ba-acae-e0d506adfd39` |
+| 却下版 | `work/premiere/FERIEST_0801_ebi_v1__premierev2_6cut_20260809_1743.prproj`（★開かない）|
+
+★**`.prproj` のコピーを開かない**（documentIDが複製されシーケンスが合流します・恒久ルール15）。
+
+---
+
+## 7. 動作確認（Premiere 無しでここまで通ります）
+
+```bash
+python3 .fork/gen_projects.py --check
+python3 scripts/reference_match.py \
+  --build design/build_0801.json --mp4 data/baseline/0801_baseline_v9.mov \
+  --out qc/reference_match_0801.json
+python3 scripts/calibration_harness.py mechanical \
+  --build design/build_0801.json --mp4 data/baseline/0801_baseline_v9.mov \
+  --out qc/calibration
+```
+
+期待される結果（2026-08-11 時点の実測）:
+
+| | |
+|---|---|
+| `gen_projects.py --check` | `OK` |
+| `reference_match.py` | **13 PASS / 1 FAIL**（G90-14 は未解決の実指摘。伏せずに残してあります）|
+| `calibration_harness.py` | **検出率 4/4 PASS** |
+
+★2が **PASS だけ**になったら、直ったのではなく**判定が空振りしている**可能性を疑ってください。
+実際に G92 が「ΔRGB が構造的にしきい値を下回れない」実装バグを1件検出しています。
+
+---
+
+## 8. ここまで来たら読むもの（順番を飛ばさない）
+
+| 順 | ファイル | 中身 |
+|---|---|---|
+| 1 | **`.fork/PROJECT-RULES.md`** | 恒久ルール15条・合格条件の上書き宣言・作業の型・やってはいけない |
+| 2 | **`HANDBOOK.md`** | 案件の全知見（参考の実測値・効いた修正の履歴・環境の罠）|
+| 3 | `skill/donki-feriest/references/` | 仕様の正本7本（下表）|
+| 4 | `.fork/REFERENCE-TARGETS.json` | 「瓜二つ」を判定する基準値（機械可読）|
+| 5 | `.fork/lenses/lenses.json` | 独立レビュー12レンズ |
+
+| references | 中身 |
+|---|---|
+| `REFERENCE-SPEC.md` | 参考「0.7人前うどん」の全実測値 |
+| `TELOP-SPEC.md` | テロップの3階層の文法 |
+| `PREMIERE-RECIPE.md` | Premiere の組み方（コード付き）|
+| `TRAPS.md` | 踏んだ罠（API 18件・測定器の盲点7件・素材6件・選定5件・運用6件）|
+| `ASSETS.md` | ★**素材DBの引き方**・窓のスキーマ |
+| `PROJECT-RULES.md` / `MINIMAL-SET.md` | 案件ルール・最小セット |
+
+---
+
+## 9. 素材の探し方（★DBのラベルを信用しない）
+
+同梱の素材DB **`data/asset_db/feriest_0801-0805_windows.sqlite`** を引きます。
+**1素材×時間窓 = 1行**で、3,774窓 / 189クリップ / 71列。引き方は `ASSETS.md` の3節に実例があります。
+
+```bash
+DB="data/asset_db/feriest_0801-0805_windows.sqlite"
+sqlite3 -header -column "$DB" "
+SELECT win, dur, bright_med, white_max, sharp_med, shot_size, substr(action,1,40)
+FROM asset_windows_v2
+WHERE key LIKE '海老ドーン%' AND white_max<0.05 AND dur>=1.85
+ORDER BY sharp_med DESC LIMIT 15;"
+```
+
+★守ること（`ASSETS.md` と `PROJECT-RULES.md` から）:
+
+- **選定の主キーは `action`**（何をしているか）。`inventory` は照合に使わない（偽陽性を量産する）
+- **`person_count` は実画と食い違うことがある**。必ず目視で裏を取る
+- **DBの数値は目安。最終判断は実素材を測る**
+- `product` の `_dup_1Z5Zs0` 付き12窓は集計から除外する
+- **向き** — 原本は全て 3840×2160 で返るが、229本は rotation メタで実体は縦。
+  真に横なのは5本だけ（a0947 / a0950 / a0951 / a0803 / **a0933**）
+- **連番が商品をまたぐ**。★**フォルダ名の商品帰属を信用しない**
+
+---
+
+## 10. 作業の型（`PROJECT-RULES.md` 5節）
+
+```
+[0] 修正台帳／字コンテから、やることを引く
+[1] ★実測してから動く（推測で直さない）
+[2] カットを選ぶなら 3〜5候補をスコアリング
+     内容一致45 / 寄り引き15 / 新鮮さ15 / 尺10 / 画質5 / NG−100
+     「置かない・変えない」も候補に入れる。全候補を実画で目視
+[3] ★独立レビュー 12レンズ × 3ラウンド = 36回（隔離・反証・多数決）＋ 盲検ランキング(G91)
+[4] Premiere で実装 → 全ショットの機械検算
+[5] ★完成画素で検証（読み戻しだけで「できた」と言わない）＋ 参考突合(G90) ＋ 較正ハーネス(G92)
+[6] 記録（修正台帳の行 ＋ 修正記録DB に1行）
+```
+
+### ★絶対に守る（恒久ルールの抜粋。全文は `PROJECT-RULES.md` 2節）
+
+- **コンテの文言は一字も変えない**（赤入れ後が確定内容）
+- **追撮はしない**。不足はテロップ/ナレで補う
+- **今回の素材は全て顔出しOK**。顔が出ていてもNG分類しない・顔クロップ不要
+- **py・prproj・jsx は上書き禁止**。必ず新版・**却下版も消さない**
+- **完成MP4を直接編集しない**。修正は必ず生成側から
+- **参考 `0.7人前うどん.prproj` は読むだけ。絶対に編集しない**
+- **`core/` `skills/` は編集禁止レイヤ**。案件固有の判断は `.fork/` と `skill/donki-feriest/` に書く
+- **並列は par15**（par20 だと ExFAT マウントが落ちる・実際に発生）
+- **字コンテの無い2商材**（トロリスタ・ホイールグローブ）は**コンテ到着まで着手しない**
+
+### 毎回やる機械検算（全部0件が正常）
+
+```
+V1の隙間/重なり ・ 同一素材同一区間の重複 ・ 全トラックの終端ずれ
+MOGRTの fontTextRunLength 不一致 ・ ズームキーの inPoint 頭ズレ
+設計カット点で画が変わらない ・ 設計外の画変わり
+白飛び2%超のショット ・ 黒フレーム ・ 0.40秒未満のショット
+```
+
+---
+
+## 11. 過去の作業を読む・再利用する
+
+`work/jsx_20260809/` に、0801 を実際に組んだ ExtendScript **98本**が世代ごとに残っています。
+
+| 接頭 | 本数 | 中身 |
+|---|---|---|
+| `r` | 10 | 参考うどん prproj の読み取り・分析 |
+| `v` | 38 | 初回組み上げ（make_project → import → place_cuts → telop → export の反復）|
+| `t` `u` | 19 | MOGRT v22 の probe・素材差し替え・Lumetri修正・ズーム全適用 |
+| `w` | 10 | 再構築（rebuild → fx → verify → repair → export）|
+| `x` `y` | 13 | テロップ配置・強調の詰め |
+| `z` | 8 | 最終修正（c04/c05 差し替え・c01 fit・final export）|
+
+★**`work/jsx_20260809/_rejected/` の5本は実行禁止**です（MOGRT v20 を参照する却下版）。
+投げても先頭で中断しますが、v22 系列（`t/u/w/x`）に同じ役割のものがあります。
+
+`design/build_0801.json` の `_provenance` が、設計値の出どころとしてこの jsx を名指ししています
+（ショット表 = `w02_rebuild` / `z08_c04c05`、テロップ書式 = `w05_repair` / `u05_telop3` ほか）。
+
+---
+
+## 12. 詰まったら
+
+| 症状 | 見るところ |
+|---|---|
+| `pr.sh` が無反応でタイムアウト | Start Bridge を押し忘れ（手順4⑤）。★タイムアウト＝失敗ではないので、作り直す前に読み戻す |
+| `Script validation failed` | ブリッジが `require(` `process.` `eval(` `new Function(` を**コメント内でも**弾く |
+| 「配置は正しいのにアニメーションだけ効かない」 | キーフレームの時間軸。★静止画クリップの inPoint は慣例で **3600.000秒**。`SETUP.md` 5節 |
+| クリップが全部オフライン | 手順6（prproj の置き場所）か手順5（リンク検査）|
+| 書体が違うものになっている | 手順3。★Premiere は未インストール書体を**警告なしに差し替える** |
+| 日本語パスが一致しない | ExFAT の NFD 問題。`unicodedata.normalize` か glob で拾う |
+| zip の日本語名が化ける | `unzip` ではなく `ditto -x -k` |
+
+より詳しい罠は `skill/donki-feriest/references/TRAPS.md`（API 18件ほか）と
+`skills/premiere-bridge-ops/references/API-TRAPS.md` にあります。
+
+---
+
+## 13. この案件のスコープ
+
+| video_id | 商材 | 状態 |
+|---|---|---|
+| **0801** | 海老ドーン 贅沢ぷりぷり海老マヨピザ | **構築済み**（修正の実演用）|
+| **0802** | ド情熱 逆さで使える消臭スプレー＆速乾防水スプレー | ゼロから組み上げ |
+| **0803** | おうちでライブマイク | ゼロから組み上げ |
+| **0804** | Reebok ファン付きベスト | ゼロから組み上げ |
+| **0805** | Mii + フレグランスオイル、ロックミルク | ゼロから組み上げ |
+
+★**素材が無い4件は確定済み**（探せば見つかる、と誤認しないこと。全数検索で不在を確定しています）:
+0803「3色展開」は**実物が黒とシルバーの2色のみ**・0804「モバイルバッテリーで起動」「1万円以下」・
+0805「香水みたいにいい香り」。**ライブマイクの3色は画と文言が食い違う**のでクライアント確認が要ります。
+
+クライアントの赤入れ（原文）は `HANDBOOK.md` 3節にあります。
+★全案件横断で「**もう少し遊び心や視聴者がクスッとできる要素**」、
+構成は「**1カットごとに異なる訴求を詰め込まず、動画全体で一番伝えたい訴求をカット同士でつなげる**」。

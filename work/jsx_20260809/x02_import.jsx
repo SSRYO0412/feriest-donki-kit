@@ -1,7 +1,7 @@
 var L=[]; function log(s){L.push(String(s));}
 var DOC="3ea1839d-a639-48ba-acae-e0d506adfd39";
 var REF="6822d0d1-041a-46a0-a5ff-735087200a01";
-var P="@@FERIEST_ROOT@@/02_work/premiere/assets_emoji/1f364.png";
+var P="@@KIT_ROOT@@/skill/donki-feriest/assets/1f364.png";
 var proj=null;
 for(var i=0;i<app.projects.numProjects;i++) if(app.projects[i].documentID===DOC) proj=app.projects[i];
 if(!proj || proj.documentID===REF){ log("★中断"); }

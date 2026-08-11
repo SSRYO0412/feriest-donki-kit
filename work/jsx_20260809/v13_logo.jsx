@@ -3,7 +3,7 @@ var OUT="@@BRIDGE_DIR@@/ebi_v13.txt";
 var DOC="3ea1839d-a639-48ba-acae-e0d506adfd39";
 var REF="6822d0d1-041a-46a0-a5ff-735087200a01";
 var TPF=8467200000, TOTAL=337;
-var LOGO="@@FERIEST_ROOT@@/01_assets/0.7人前うどん/0.7人前うどん/0.7人前うどん/月乗りドンペン.jpg";
+var LOGO="@@KIT_ROOT@@/data/reference/月乗りドンペン.jpg";
 function T(t){ var x=new Time(); x.ticks=String(t); return x; }
 var proj=null;
 for(var i=0;i<app.projects.numProjects;i++) if(app.projects[i].documentID===DOC) proj=app.projects[i];
