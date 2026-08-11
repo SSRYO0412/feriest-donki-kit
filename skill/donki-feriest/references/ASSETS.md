@@ -14,6 +14,8 @@
 | `data/asset_db/media_manifest.json` | **在庫表**。5商材 188クリップの名前と実尺（秒）＋窓数の集計 | `check_links.py --verify-media` の検収・件数検算 |
 | `data/design/s34_FINAL3.json` | ★**スロット別の候補リスト（選抜済み）**。5商材 × 6スロット・候補 **562件**。各候補に `t0/t1/dur/shot/comp/quality/blur/persons/matched` | 0802〜0805 の選定の出発点 |
 | `data/conte/conte.json` | 字コンテ45スロット（`need` = must+want の被写体要求つき） | 何を探すかの正 |
+| `data/revision_aids/alternatives.json` | ★**軸別の代替候補**（白飛び/動き/カメラワーク種類/寄り引き/人物なし/被写体中心・スロット別top5＋商材別極値） | 修正指示への即応（`REVISION-PLAYBOOK.md`） |
+| `data/revision_aids/clip_profiles.json` | 188本×1秒粒度の数値プロファイル（カメラ分類つき） | 候補表の外を探す粗い地図 |
 
 ### 在庫の内訳（media_manifest.json の実測値）
 
