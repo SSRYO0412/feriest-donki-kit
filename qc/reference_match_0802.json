@@ -1,0 +1,287 @@
+{
+ "gate": "G90",
+ "name": "参考突合（瓜二つ判定）",
+ "video_id": "0802",
+ "build": "/Volumes/Extreme SSD/FERIEST/99_tmp/0802_build/build_0802.json",
+ "mp4": "/Volumes/Extreme SSD/FERIEST/02_work/premiere/verify_20260811/0802_v4.mov",
+ "reference": "0.7人前うどん",
+ "verdict": "PASS",
+ "n_fail": 0,
+ "n_waived": 0,
+ "items": [
+  {
+   "id": "G90-1",
+   "name": "最短ショット",
+   "verdict": "PASS",
+   "measured": {
+    "under_floor": [],
+    "min": 14
+   },
+   "expected": {
+    ">=": 14
+   },
+   "note": "参考の最短が14F(0.467秒)。これを下回ると視聴者が画を認識する前に次へ行く（2026-08-09 Codex指摘・採用）"
+  },
+  {
+   "id": "G90-2",
+   "name": "最長ショット",
+   "verdict": "PASS",
+   "measured": {
+    "over_cap": [],
+    "max": 52
+   },
+   "expected": {
+    "<=": 70
+   },
+   "note": "超えるなら『画の強さ』の根拠を書く。0801では静止全景2.17秒が弱いと指摘された"
+  },
+  {
+   "id": "G90-3",
+   "name": "ショット尺の中央値",
+   "verdict": "PASS",
+   "measured": {
+    "median_frames": 23.0,
+    "median_sec": 0.767
+   },
+   "expected": {
+    "band_frames": [
+     16.8,
+     31.2
+    ],
+    "ref": 24
+   },
+   "note": ""
+  },
+  {
+   "id": "G90-4",
+   "name": "1テロップあたりのショット数（主判定）",
+   "verdict": "PASS",
+   "measured": {
+    "shots": 12,
+    "telops": 6,
+    "shots_per_telop": 2.0
+   },
+   "expected": {
+    "band": [
+     1.239,
+     2.301
+    ],
+    "ref": 1.77
+   },
+   "note": "★主判定は cuts_per_min ではなく shots_per_telop。参考は19.97秒で13テロップ。テロップ密度が違う動画にカット密度だけ合わせると画変わりだけが過剰になる（2026-08-09 Codex指摘・採用）"
+  },
+  {
+   "id": "G90-5",
+   "name": "cuts/分（参考値・単独では合否にしない）",
+   "verdict": "PASS",
+   "measured": {
+    "cuts_per_min": 68.4,
+    "duration_sec": 10.533
+   },
+   "expected": {
+    "ref": 69.1
+   },
+   "note": "★これだけを参考に合わせると過剰分割になる。主判定はG90-4"
+  },
+  {
+   "id": "G90-6",
+   "name": "テロップ様式が3階層のどれかに一致",
+   "verdict": "PASS",
+   "measured": {
+    "off_grammar": [],
+    "n": 6
+   },
+   "expected": {
+    "tiers": [
+     "通常",
+     "感嘆・言い切り",
+     "商品名の2行組"
+    ]
+   },
+   "note": "★参考のテロップは1種類ではない。13区間を全部並べて種別を分類してから様式を測る。1枚だけ見て決めない"
+  },
+  {
+   "id": "G90-7",
+   "name": "フチ色",
+   "verdict": "PASS",
+   "measured": {
+    "off": []
+   },
+   "expected": {
+    "stroke_color": "#3C3934"
+   },
+   "note": "★純黒ではない。暗いグレー"
+  },
+  {
+   "id": "G90-14",
+   "name": "ズーム文法",
+   "verdict": "PASS",
+   "measured": {
+    "off_grammar": [],
+    "waived": []
+   },
+   "expected": {
+    "start": 100,
+    "end_range": [
+     112,
+     117
+    ]
+   },
+   "note": "★意図して外すのは可。ただし外した分だけ shots[].zoom_waiver に理由と独立承認を残す（0801のc04は『もっとピザに寄って。』の指示で115→135）"
+  },
+  {
+   "id": "G90-8",
+   "name": "尺（完成ファイル）",
+   "verdict": "PASS",
+   "measured": {
+    "mp4_frames": 316,
+    "wh": [
+     1080,
+     1920
+    ],
+    "fps": 30.0
+   },
+   "expected": {
+    "design_frames": 316,
+    "wh": [
+     1080,
+     1920
+    ]
+   },
+   "note": "★書き出しが途中で止まっても報告は成功に見える。実ファイルで数える"
+  },
+  {
+   "id": "G90-9",
+   "name": "白飛び（相対比較）",
+   "verdict": "PASS",
+   "measured": {
+    "per_shot": {
+     "c01": 0.00343,
+     "c02": 0.00343,
+     "c03": 0.00343,
+     "c04": 0.0037,
+     "c05": 0.0037,
+     "c06": 0.0037,
+     "c07": 0.0037,
+     "c08": 0.0037,
+     "c09": 0.00343,
+     "c10": 0.00356,
+     "c12": 0.00343,
+     "c13": 0.00343
+    },
+    "median": 0.003495
+   },
+   "expected": {
+    "outliers": 0,
+    "abs_max": 0.02
+   },
+   "note": "★他のショットと比べて初めて異常と分かる。絶対値だけで判断しない"
+  },
+  {
+   "id": "G90-10",
+   "name": "黒フレーム",
+   "verdict": "PASS",
+   "measured": {
+    "frames": [],
+    "n": 0
+   },
+   "expected": {
+    "n": 0
+   },
+   "note": ""
+  },
+  {
+   "id": "G90-11",
+   "name": "設計カット点で画が変わる",
+   "verdict": "PASS",
+   "measured": {
+    "missing_cuts": [],
+    "threshold": 8.48,
+    "median_diff": 2.42
+   },
+   "expected": {
+    "missing": 0
+   },
+   "note": "設計上は切ったのに画が変わらない＝同一素材の連続や差し替え漏れ"
+  },
+  {
+   "id": "G90-12",
+   "name": "設計外の画変わりが無い",
+   "verdict": "PASS",
+   "measured": {
+    "unexpected_at": []
+   },
+   "expected": {
+    "n": 0
+   },
+   "note": "★素材内のシーン切替を踏んでいる可能性。窓の t0/t1 を実画で見直す"
+  },
+  {
+   "id": "G90-13",
+   "name": "テロップと背景の ΔRGB",
+   "verdict": "PASS",
+   "measured": {
+    "per_telop": [
+     {
+      "text": "その靴、そのまま履くのちょっと待って〜!!",
+      "telop": "#FDFCFD",
+      "bg": "#8D8880",
+      "bg_px_ratio": 0.099,
+      "delta": 202.7,
+      "ok": true
+     },
+     {
+      "text": "靴を持たずに逆さでそのままシューッ!",
+      "telop": "#FDFCFD",
+      "bg": "#B8B7B5",
+      "bg_px_ratio": 0.106,
+      "delta": 120.3,
+      "ok": true
+     },
+     {
+      "text": "届きにくい奥までしっかり消臭!",
+      "telop": "#FDFCFD",
+      "bg": "#B7B0AD",
+      "bg_px_ratio": 0.478,
+      "delta": 129.6,
+      "ok": true
+     },
+     {
+      "text": "雨が降りそうならこっちも忘れないで!",
+      "telop": "#FDFCFD",
+      "bg": "#9D9D98",
+      "bg_px_ratio": 0.306,
+      "delta": 168.4,
+      "ok": true
+     },
+     {
+      "text": "速乾だから出発前でも余裕〜!",
+      "telop": "#FDFCFD",
+      "bg": "#B9BABA",
+      "bg_px_ratio": 0.518,
+      "delta": 115.1,
+      "ok": true
+     },
+     {
+      "text": "これ知ったら戻れない😂",
+      "telop": "#FDFCFD",
+      "bg": "#848180",
+      "bg_px_ratio": 0.195,
+      "delta": 212.1,
+      "ok": true
+     }
+    ]
+   },
+   "expected": {
+    ">=": 60,
+    "band": [
+     93.3,
+     141.8
+    ]
+   },
+   "note": "★下段の色は『食材を思わせる色 かつ 背景から浮く彩度』。背景の支配色をそのまま採ると埋もれる"
+  }
+ ],
+ "_waived_note": "★WAIVED は『測ったら外れていたが、理由と独立承認を添えて残した』の意味。PASS と混ぜて数えない。台帳にはこの件数をそのまま書く",
+ "_note": "★これは測定なのでモデル多様性の問題を受けない。判断が要るゲート（G50系・G91）とは別物として扱う"
+}
