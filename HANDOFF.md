@@ -71,7 +71,7 @@ export FERIEST_ROOT=~/FERIEST     # 内蔵でも可（.feriest-paths に書い�
 ## 1. クローン
 
 ```bash
-git clone -b worktree-portable-paths https://github.com/SSRYO0412/feriest-donki-kit.git
+git clone https://github.com/SSRYO0412/feriest-donki-kit.git
 cd feriest-donki-kit
 ```
 
