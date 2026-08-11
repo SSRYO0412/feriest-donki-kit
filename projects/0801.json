@@ -1,0 +1,48 @@
+{
+ "_note": "★.fork/gen_projects.py が生成。手で書き換えない。実測で値が変わったら生成元（REFERENCE-TARGETS.json / conte.json）を直して再生成する",
+ "_generated_by": ".fork/gen_projects.py",
+ "video_id": "0801",
+ "product": "海老ドーン贅沢ぷりぷり海老マヨピザ",
+ "media_dir": "/Volumes/Extreme SSD/FERIEST/00_source_drive/20260807_新素材_8月掲載分/海老ドーン贅沢ぷりぷり海老マヨピザ",
+ "conte_slots": 9,
+ "telops": 7,
+ "assets": {
+  "windows": 429,
+  "sources": 24
+ },
+ "target": {
+  "_derivation": "shots = telops × shots_per_telop(参考1.77) / duration = shots × shot_len_median(参考0.80秒)。★参考の骨格に合わせる reference-first。素材の都合で決めない",
+  "shots": 12,
+  "shots_band": [
+   8,
+   16
+  ],
+  "duration_sec": 9.6,
+  "shot_len_median_sec": 0.8,
+  "shot_len_min_sec": 0.467,
+  "shot_len_max_sec": 2.333,
+  "_band_note": "帯を外れたら理由を qc/tempo_report.json に書く。『そのまま残す』を選ぶなら independent_approval が要る"
+ },
+ "client_notes": [
+  "「お盆はトロリスタのピザに決まり！」→「お盆はドンキのピザに決まり！」",
+  "商品の魅力はしっかり伝わる構成になっていると思いますが、全体的にストレートな商品紹介にまとまっている印象もあるので、SNS動画としてはもう少し遊び心や視聴者がクスッとできる要素があっても良さそうと感じてます。（このコンテに限った話ではなく全体的に）"
+ ],
+ "_client_notes_note": "★字コンテの赤入れ原文。要約・言い換えをしない。これが確定内容",
+ "no_material": [],
+ "_no_material_note": "★全数検索で不在を確定済み。『探せば見つかる』と誤認しない",
+ "status": "built",
+ "prproj": "/Volumes/Extreme SSD/FERIEST/02_work/premiere/FERIEST_0801_ebi_v1.prproj",
+ "sequence": "0801_ebi",
+ "document_id": "3ea1839d-a639-48ba-acae-e0d506adfd39",
+ "version": "v7",
+ "actual": {
+  "frames": 337,
+  "duration_sec": 11.233,
+  "shots": 10,
+  "cuts_per_min": 53.4,
+  "shot_len_median_sec": 0.93,
+  "telops": 6,
+  "shots_per_telop": 1.67
+ },
+ "role": "★修正の実演の出発点。ゼロから組む対象ではない"
+}

@@ -1,0 +1,42 @@
+{
+ "_note": "★.fork/gen_projects.py が生成。手で書き換えない。実測で値が変わったら生成元（REFERENCE-TARGETS.json / conte.json）を直して再生成する",
+ "_generated_by": ".fork/gen_projects.py",
+ "video_id": "0805",
+ "product": "Mii +フレグランスオイル、ロックミルク",
+ "media_dir": "/Volumes/Extreme SSD/FERIEST/00_source_drive/20260807_新素材_8月掲載分/Mii +フレグランスオイル、ロックミルク",
+ "conte_slots": 9,
+ "telops": 6,
+ "assets": {
+  "windows": 1307,
+  "sources": 47
+ },
+ "target": {
+  "_derivation": "shots = telops × shots_per_telop(参考1.77) / duration = shots × shot_len_median(参考0.80秒)。★参考の骨格に合わせる reference-first。素材の都合で決めない",
+  "shots": 11,
+  "shots_band": [
+   7,
+   14
+  ],
+  "duration_sec": 8.8,
+  "shot_len_median_sec": 0.8,
+  "shot_len_min_sec": 0.467,
+  "shot_len_max_sec": 2.333,
+  "_band_note": "帯を外れたら理由を qc/tempo_report.json に書く。『そのまま残す』を選ぶなら independent_approval が要る"
+ },
+ "client_notes": [
+  "毛先だけのアップは禁止（パサついて見える）",
+  "毛束全体のまとまり・ツヤを見せる",
+  "香りの訴求をもっと最初に"
+ ],
+ "_client_notes_note": "★字コンテの赤入れ原文。要約・言い換えをしない。これが確定内容",
+ "no_material": [
+  {
+   "要求": "香水みたいにいい香り",
+   "撮られていないもの": "香りを確かめる動作",
+   "確定": "テロップ/ナレで補う"
+  }
+ ],
+ "_no_material_note": "★全数検索で不在を確定済み。『探せば見つかる』と誤認しない",
+ "status": "to_build",
+ "role": "★ゼロから組み上げる対象"
+}
