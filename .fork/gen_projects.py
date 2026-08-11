@@ -64,7 +64,7 @@ BUILT = {
 
 def db_counts():
     """在庫表 media_manifest.json から (窓集計, クリップ数) を引く。
-    ★窓単位の解析データは配布物に含めない方針（.fork/gen_manifest.py）。ここは集計値のみ。"""
+    ★窓単位の解析データは配布物に含めない方針。ここは集計値のみ（在庫表の再生成は発注側の内部ツールで行う）。"""
     m = json.load(open(p(BASE["source"]["manifest"])))
     return {prod: (v["n_windows"], len(v["clips"])) for prod, v in m["products"].items()}
 
