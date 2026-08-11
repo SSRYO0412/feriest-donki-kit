@@ -3,7 +3,7 @@
 
 なぜ要るか
 ----------
-原本フッテージ（227本・38GB）はリポジトリに入っていない。クライアント側が別で持っている
+原本フッテージ（5商材 188本・34.5GB）はリポジトリに入っていない。クライアント側が別で持っている
 原本と結ぶのが前提で、結び方は「FERIEST_ROOT を1つ教える」だけ。
 ただし **リンク切れは Premiere 側で無言に起きる**（オフラインクリップとして黙って並ぶ）。
 着手前にここで落としておかないと、組み上げた後に気づくことになる。
@@ -14,6 +14,13 @@
     python3 scripts/check_links.py            # 全案件＋前提ソフト
     python3 scripts/check_links.py 0801       # 案件を指定
     python3 scripts/check_links.py --fix-dirs # 足りない書き出し先ディレクトリを作る
+    python3 scripts/check_links.py --verify-media  # ★原本を全数照合（新規ダウンロード時）
+
+★原本を今から用意する／ダウンロードした場合は `--verify-media` を必ず通すこと。
+  素材DBが**そのまま在庫表**になっている（188クリップの名前と尺を持っている）ので、
+  別のマニフェストを用意しなくても「落とし切れているか」を機械照合できる。
+  Google Drive からの取得では **268本と出るが実際は315本** という取りこぼしを実際に踏んでいる
+  （HANDBOOK 1節）。★**落とし切れていないのに落とし切れたように見える**のが怖いところ。
 
 ★ExFAT の NFD 問題を踏むので、ファイル名は正規化して突き合わせる。
   日本語フォルダ名（例 20260807_新素材_8月掲載分）は NFC/NFD の差で
@@ -159,9 +166,119 @@ def check_prereq(tokens, fix_dirs, skip_fonts):
     return ng
 
 
+ASSET_DB = os.path.join(KIT_ROOT, "data/asset_db/feriest_0801-0805_windows.sqlite")
+DUR_TOL = 0.10   # 秒。DBの max(t1) と実尺の許容差（実測は12本抽出で全て 0.00 差）
+
+
+def _expected_clips():
+    """素材DBから「商材ごとにあるべきクリップ名と尺」を復元する。
+
+    key は "<product>_<clipname>" 形式。max(t1) が素材の実尺と一致することを実測で確認済み
+    （12本抽出で全て差 0.00秒）。★つまりDBがそのまま在庫表兼チェックサムになる。
+    `_dup_` 付きの product は集計から除外する（ASSETS.md / project.base.json）。
+    """
+    import sqlite3
+    c = sqlite3.connect(ASSET_DB)
+    out = {}
+    for prod, key, t1 in c.execute(
+            "SELECT product, key, MAX(t1) FROM asset_windows_v2 "
+            "WHERE product NOT LIKE '%_dup_%' GROUP BY product, key"):
+        if not key.startswith(prod + "_"):
+            continue
+        out.setdefault(prod, {})[_nfc(key[len(prod) + 1:])] = t1
+    return out
+
+
+def _probe_dur(path):
+    r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration",
+                        "-of", "csv=p=0", path], capture_output=True, text=True)
+    try:
+        return float(r.stdout.strip())
+    except ValueError:
+        return None
+
+
+def verify_media(tokens, want):
+    """原本を全数照合する。名前の欠け／余りと、尺のズレ（＝途中で切れた・取り違え）を出す。"""
+    from concurrent.futures import ThreadPoolExecutor
+
+    if not os.path.exists(ASSET_DB):
+        print("  NG  素材DBが無い: %s" % ASSET_DB)
+        return 1
+    if not shutil.which("ffprobe"):
+        print("  NG  ffprobe が無いので尺を検査できない")
+        return 1
+
+    exp = _expected_clips()
+    ng = 0
+    print("\n== 原本の全数照合（素材DBと突合）==")
+
+    for path in sorted(glob.glob(os.path.join(KIT_ROOT, "projects", "*.json"))):
+        proj = json.load(open(path, encoding="utf-8"))
+        vid, prod = proj["video_id"], proj["product"]
+        if want and vid not in want:
+            continue
+        if prod not in exp:
+            print("  NG  %s  素材DBに product が無い: %s" % (vid, prod))
+            ng += 1
+            continue
+
+        media_dir = proj["media_dir"]
+        for tok, val in tokens.items():
+            media_dir = media_dir.replace(tok, val)
+        if not os.path.isdir(media_dir):
+            print("  NG  %s  素材フォルダが無い" % vid)
+            ng += 1
+            continue
+
+        have = {}   # 拡張子を落とした名前 -> 実パス
+        for b, p in _listdir_nfc(media_dir).items():
+            have[os.path.splitext(b)[0]] = p
+
+        wants = exp[prod]
+        missing = sorted(set(wants) - set(have))
+        extra = sorted(set(have) - set(wants))
+
+        # ★尺は並列で測る。par15 を超えない（ExFAT のマウントが落ちる・恒久ルール5）
+        targets = [(n, have[n], wants[n]) for n in sorted(set(wants) & set(have))]
+        with ThreadPoolExecutor(max_workers=8) as ex:
+            durs = list(ex.map(lambda t: _probe_dur(t[1]), targets))
+
+        bad = []
+        for (name, _p, t1), real in zip(targets, durs):
+            if real is None:
+                bad.append((name, t1, None))
+            elif abs(real - t1) > DUR_TOL:
+                bad.append((name, t1, real))
+
+        okn = len(targets) - len(bad)
+        mark = "OK" if not (missing or extra or bad) else "NG"
+        print("  %s  %s  %-26s %d/%d本 照合" % (mark, vid, prod[:24], okn, len(wants)))
+        for n in missing[:8]:
+            print("      欠け      %s" % n)
+        if len(missing) > 8:
+            print("      欠け      …ほか %d本" % (len(missing) - 8))
+        for n in extra[:5]:
+            print("      DBに無い  %s" % n)
+        for n, t1, real in bad[:8]:
+            if real is None:
+                print("      読めない  %s（破損の可能性）" % n)
+            else:
+                print("      尺ズレ    %s  DB %.2f秒 / 実測 %.2f秒（差 %+.2f）"
+                      % (n, t1, real, real - t1))
+        if missing or extra or bad:
+            ng += 1
+
+    if ng:
+        print("\n  ★取りこぼし・破損の可能性があります。**落とし切れていないのに"
+              "落とし切れたように見える**のが一番危ないので、ここは通してから着手してください。")
+    return ng
+
+
 def main(argv):
     fix_dirs = "--fix-dirs" in argv
     skip_fonts = "--no-fonts" in argv
+    do_verify = "--verify-media" in argv
     argv = [a for a in argv if not a.startswith("-")]
 
     tokens = resolve()
@@ -213,6 +330,12 @@ def main(argv):
             ng += 1
         else:
             print("      使用素材 %d/%d 本すべて実在" % (len(srcs), len(srcs)))
+
+    if do_verify:
+        ng += verify_media(tokens, want)
+    else:
+        print("\n  ヒント: 原本を今から用意した／ダウンロードした場合は "
+              "--verify-media で全数照合できます")
 
     ng += check_prereq(tokens, fix_dirs, skip_fonts)
 

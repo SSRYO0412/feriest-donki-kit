@@ -18,7 +18,7 @@ python3 --version                # 3.9+ / 標準ライブラリのみ使用
 
 ### 0-1. 原本素材の場所を教える（★別マシンで最初にやること）
 
-原本フッテージ（227本・38GB）は**このリポジトリに入っていません**。手元の原本と結びます。
+原本フッテージ（5商材 **188本・34.5GB**）は**このリポジトリに入っていません**。手元の原本と結びます。
 
 ```bash
 cp .feriest-paths.example .feriest-paths
@@ -222,6 +222,7 @@ if (n === "スケール" || n === "スケール (高さ)") { /* ... */ }
 # 0) パス解決と素材リンク（★別マシンでは最初にここ）
 python3 scripts/resolve_paths.py
 python3 scripts/check_links.py
+python3 scripts/check_links.py --verify-media   # ★原本を新規に用意した場合
 
 # 1) 案件プロファイルが生成元と一致するか
 python3 .fork/gen_projects.py --check

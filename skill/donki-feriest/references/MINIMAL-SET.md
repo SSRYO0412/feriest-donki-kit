@@ -6,7 +6,7 @@
 
 | | 状態 |
 |---|---|
-| **原本フッテージ**（227本・38GB） | ⚠️ **リポジトリに入らない**。手元の原本を `FERIEST_ROOT` で指す（`scripts/check_links.py` で検査）|
+| **原本フッテージ**（5商材 188本・34.5GB） | ⚠️ **リポジトリに入らない**。手元の原本を `FERIEST_ROOT` で指す（`scripts/check_links.py` で検査）|
 | **案件 jsx 98本** | ✅ `work/jsx_20260809/` に**同梱済み**（絶対パスはトークン化・v20参照5本は `_rejected/`）|
 | **作業 prproj**（0801 採用版＋却下版） | ✅ `work/premiere/` に**同梱済み**（`<RelativePath>` 保持で自動再リンク）|
 | **SSD の中身**（窓DB・構成設計・参考分析） | ✅ リポジトリに同梱済み |
@@ -174,7 +174,7 @@ cd ~/video-ops-framework && bash core/ops/scripts/install.sh
                     ├─ 判断の正本 15ファイル（core/ と skills/）
                     └─ この案件専用スキル（donki-feriest）
 
-    手元の原本 ─────── フッテージ 227本・38GB（FERIEST_ROOT で指す）
+    手元の原本 ─────── フッテージ 188本・34.5GB（FERIEST_ROOT で指す）
 
     マシン ─────────┬─ Premiere Pro 2026 + Adobe Media Encoder
                     ├─ Adobe Fonts: mplus-1p-heavy / HeiseiMinStd-W9 / Makinas-4-Square

@@ -19,6 +19,7 @@
 # ★環境構築の全手順は HANDOFF.md にある
 cp .feriest-paths.example .feriest-paths   # FERIEST_ROOT を自分の場所に書き換える
 python3 scripts/check_links.py
+python3 scripts/check_links.py --verify-media   # 原本を新規に用意したなら全数照合（188本・約3秒）
 
 # 参考と瓜二つか（完成MP4の画素を実測して参考の実測値と突合）
 python3 scripts/reference_match.py \
