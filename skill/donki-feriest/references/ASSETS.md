@@ -4,14 +4,28 @@
 
 ## 1. 素材DBの場所
 
-**`/Volumes/Extreme SSD/FERIEST/01_assets/db_202608/feriest_202608_v5_fix.sqlite`**
+**キット同梱**: `data/asset_db/feriest_0801-0805_windows.sqlite`（テーブル `asset_windows_v2` / 3,774窓）
+
+元になった全案件DB（キットには入っていない）: `@@FERIEST_ROOT@@/01_assets/db_202608/feriest_202608_v5_fix.sqlite`
 
 ★**v5_fix が正本**。v1〜v4 は工程途中の版（残してあるが使わない）。
 
-| テーブル | 中身 |
+| テーブル | 中身（★同梱DBの実測値 2026-08-11） |
 |---|---|
-| `asset_windows_v2` | **1素材×時間窓 = 1行**。全 **4,658 窓** / 234クリップ / **71列** |
-| `persons` | 人物レジストリ |
+| `asset_windows_v2` | **1素材×時間窓 = 1行**。**3,774 窓** / 189クリップ / **71列** |
+| `persons` | 人物レジストリ 3,377行 |
+
+★下の「4. 素材の内訳」は**全案件DB（4,658窓/234クリップ）**の数字。
+同梱DBは 0801〜0805 の5商材だけなので、トロリスタ・アプリクーポン・ホイールグローブは入っていない。
+
+| product | クリップ | 窓 |
+|---|---|---|
+| Mii +フレグランスオイル、ロックミルク | 47 | 1,307 |
+| Reebokファン付きベスト | 46 | 803 |
+| おうちでライブマイク | 35 | 793 |
+| ド情熱逆さで使える消臭スプレー&速乾防水スプレー | 36 | 430 |
+| 海老ドーン贅沢ぷりぷり海老マヨピザ | 24 | 429 |
+| （★除外して数える）`..._dup_1Z5Zs0` | 1 | 12 |
 
 ## 2. 窓のスキーマ（71列・よく使うもの）
 
@@ -36,7 +50,7 @@
 ## 3. 引き方の例
 
 ```bash
-DB="/Volumes/Extreme SSD/FERIEST/01_assets/db_202608/feriest_202608_v5_fix.sqlite"
+DB="data/asset_db/feriest_0801-0805_windows.sqlite"   # キット同梱（テーブルは asset_windows_v2）
 
 # 商材の全窓を一覧化（★選定前に必ず全部読む）
 sqlite3 -separator '|' "$DB" "
@@ -92,7 +106,9 @@ ffmpeg -hide_banner -v error -ss <tin> -t <dur> -i <src> \
 
 ## 5. 素材の原本
 
-`/Volumes/Extreme SSD/FERIEST/00_source_drive/20260807_新素材_8月掲載分/<商材フォルダ>/`
+`$FERIEST_ROOT/00_source_drive/20260807_新素材_8月掲載分/<商材フォルダ>/`
+
+★手元の原本が引けるかは `python3 scripts/check_links.py` で検査する。
 
 ★**読み取り専用。絶対に編集しない。**
 ★プロキシ（`01_assets/db_202608/proxy/`）で**書き出さない**。実測も原本で行う。

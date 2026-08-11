@@ -2,6 +2,9 @@
 
 macOS 専用（`defaults write` / `ditto` を前提にしている）。所要 15〜30分。
 
+> ★**別マシンで一から始めるなら `HANDOFF.md` を上から順にやってください。**
+> このファイルは各手順の詳細版（罠・ExtendScriptの作法・MOGRT・キーフレーム）です。
+
 ---
 
 ## 0. 先に確認（ここで詰まる人が多い）
@@ -9,10 +12,49 @@ macOS 専用（`defaults write` / `ditto` を前提にしている）。所要 1
 ```bash
 ffmpeg -version | head -1        # 必須
 python3 --version                # 3.9+ / 標準ライブラリのみ使用
-ls "/Volumes/Extreme SSD/FERIEST" # 素材SSDがマウントされているか
 ```
 
 **pip install は不要です。** numpy も Pillow も使いません。
+
+### 0-1. 原本素材の場所を教える（★別マシンで最初にやること）
+
+原本フッテージ（5商材 **188本・34.5GB**）は**このリポジトリに入っていません**。手元の原本と結びます。
+
+```bash
+cp .feriest-paths.example .feriest-paths
+$EDITOR .feriest-paths          # FERIEST_ROOT を自分の場所に書き換える
+```
+
+`FERIEST_ROOT` は、その下に `00_source_drive/` と `02_work/premiere/` がある階層を指します。
+環境変数で渡しても同じです（`export FERIEST_ROOT=/path/to/FERIEST`。環境変数が優先）。
+
+```bash
+python3 scripts/resolve_paths.py   # 何がどこに解決されたかを一覧
+python3 scripts/check_links.py     # ★素材が実際に引けるかを検査（5案件・0801は使用10本まで）
+```
+
+`check_links.py` が **OK にならないまま Premiere を開かないでください。**
+リンク切れはオフラインクリップとして**無言で**並びます。
+
+★**prproj は相対パスも持っています**（`<RelativePath>` 36件）。
+`FERIEST_ROOT/00_source_drive` と `FERIEST_ROOT/02_work/premiere` の位置関係さえ保てば、
+Premiere が自動でメディアを再リンクします。
+
+### 0-2. パスはトークンで持っている
+
+キットの JSON と 案件 jsx（`work/jsx_20260809/`）は、マシン依存の絶対パスを直に持ちません。
+
+| トークン | 中身 | 解決元 |
+|---|---|---|
+| `@@FERIEST_ROOT@@` | 素材SSDの根 | env `FERIEST_ROOT` → `.feriest-paths` → 既定値 |
+| `@@KIT_ROOT@@` | このキットの根 | `pr.sh` の位置から自動導出 |
+| `@@BRIDGE_DIR@@` | ブリッジの受け渡し場所 | env `PR_BRIDGE_DIR`（既定 `/tmp/premiere-mcp-bridge`）|
+| `@@AME_PRESET@@` | 書き出しプリセット | env `AME_PRESET` → `/Applications` から**自動検出** |
+
+`pr.sh` が**投入直前に**実パスへ置換します。未解決のトークンが残っていたら**投入せずに落とします**。
+
+★ExtendScript 側で環境変数を読む案は使えません。Premiere は GUI 起動なのでシェルの
+`export` が届かず、かつブリッジの `validateScript` が `process.` をコメント内でも弾きます。
 
 ---
 
@@ -177,6 +219,11 @@ if (n === "スケール" || n === "スケール (高さ)") { /* ... */ }
 ## 6. 動作確認（Premiere 無しでここまで通ります）
 
 ```bash
+# 0) パス解決と素材リンク（★別マシンでは最初にここ）
+python3 scripts/resolve_paths.py
+python3 scripts/check_links.py
+python3 scripts/check_links.py --verify-media   # ★原本を新規に用意した場合
+
 # 1) 案件プロファイルが生成元と一致するか
 python3 .fork/gen_projects.py --check
 
@@ -195,6 +242,8 @@ python3 scripts/calibration_harness.py mechanical \
 
 期待される結果（2026-08-11 時点の実測）:
 
+- `resolve_paths.py` → 4トークンすべてに実在するパスが出る
+- `check_links.py` → 5案件すべて `OK`／0801 は「使用素材 10/10 本すべて実在」
 - `gen_projects.py --check` → `OK`
 - `reference_match.py` → **13 PASS / 1 FAIL**（G90-14 は未解決の実指摘。伏せずに残してある）
 - `calibration_harness.py mechanical` → **4/4 PASS**

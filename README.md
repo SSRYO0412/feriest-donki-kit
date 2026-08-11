@@ -15,6 +15,12 @@
 ## 30秒で確かめる
 
 ```bash
+# 手元の原本と結べているか＋前提ソフトが揃っているか（別マシンでは最初にここ）
+# ★環境構築の全手順は HANDOFF.md にある
+cp .feriest-paths.example .feriest-paths   # FERIEST_ROOT を自分の場所に書き換える
+python3 scripts/check_links.py
+python3 scripts/check_links.py --verify-media   # 原本を新規に用意したなら全数照合（188本・約3秒）
+
 # 参考と瓜二つか（完成MP4の画素を実測して参考の実測値と突合）
 python3 scripts/reference_match.py \
   --build design/build_0801.json \
@@ -32,9 +38,10 @@ python3 scripts/calibration_harness.py mechanical \
 
 ## 読む順番（飛ばさない）
 
+0. ★**`HANDOFF.md`** — **別マシンで始めるならまずここ。** 環境構築から着手前チェックまでの全手順
 1. **`.fork/PROJECT-RULES.md`** — 恒久ルール15条・★合格条件の上書き宣言・作業の型
 2. **`HANDBOOK.md`** — 案件の全体像・★効いた修正の履歴・やってはいけない10箇条
-3. **`SETUP.md`** — Premiere CEP Bridge・フォント・動作確認
+3. **`SETUP.md`** — Premiere CEP Bridge・フォント・動作確認（HANDOFF.md の詳細版）
 4. **`skill/donki-feriest/references/`** — 仕様の正本7本
 5. **`.fork/lenses/lenses.json`** — 独立レビュー12レンズ
 
@@ -44,8 +51,9 @@ python3 scripts/calibration_harness.py mechanical \
 ## 中身
 
 ```
+HANDOFF.md               ★別マシンで始めるまでの全手順（アクセス権〜着手前チェック）
 HANDBOOK.md              案件の全知見（Notionが見られない環境用の正本）
-SETUP.md                 環境構築と動作確認
+SETUP.md                 環境構築と動作確認（HANDOFF.md の詳細版）
 
 .fork/                   ★追記レイヤ（このフォーク固有。ここだけ書き換えてよい）
   PROJECT-RULES.md       恒久ルール・合格条件の上書き宣言
@@ -60,6 +68,15 @@ projects/                0801〜0805 の動画別プロファイル（生成物�
 scripts/
   reference_match.py     ★G90 参考突合。完成MP4の画素で測る
   calibration_harness.py ★G92 較正ハーネス。検出率を実測する
+  resolve_paths.py       トークン（@@FERIEST_ROOT@@ 等）を実パスへ解決する
+  check_links.py         ★手元の原本が引けるか検査（Premiereを開く前に通す）
+
+work/                    0801 を実際に組んだ現物
+  jsx_20260809/          案件 jsx 98本（絶対パスはトークン化済み）
+    _rejected/           ★v20 参照の却下版5本。実行すると即中断する
+  premiere/              作業 prproj（採用版＋却下版）
+
+.feriest-paths.example   パス設定の雛形（写して .feriest-paths を作る）
 core/ skills/            framework由来（★編集禁止レイヤ）
 skill/donki-feriest/     案件スキル（references 7本 + MOGRT + Twemoji + CEP Bridge）
 data/

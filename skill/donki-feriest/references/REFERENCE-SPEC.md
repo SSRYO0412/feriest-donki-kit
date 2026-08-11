@@ -4,8 +4,8 @@
 
 | | |
 |---|---|
-| 完成MP4 | `/Volumes/Extreme SSD/FERIEST/01_assets/参考/ref_うどん_0.7人前うどん.mp4` |
-| prproj | `/Volumes/Extreme SSD/FERIEST/01_assets/0.7人前うどん/0.7人前うどん/0.7人前うどん/0.7人前うどん.prproj` |
+| 完成MP4 | `data/reference/ref_うどん_0.7人前うどん.mp4`（キット同梱）|
+| prproj | `data/reference/0.7人前うどん.prproj`（キット同梱）|
 | documentID | `6822d0d1-041a-46a0-a5ff-735087200a01` ★**読むだけ・絶対に編集しない** |
 | 規格 | 1080×1920 / 30fps / **599F = 19.97秒** |
 

@@ -3,7 +3,7 @@
  "_generated_by": ".fork/gen_projects.py",
  "video_id": "0805",
  "product": "Mii +フレグランスオイル、ロックミルク",
- "media_dir": "/Volumes/Extreme SSD/FERIEST/00_source_drive/20260807_新素材_8月掲載分/Mii +フレグランスオイル、ロックミルク",
+ "media_dir": "@@FERIEST_ROOT@@/00_source_drive/20260807_新素材_8月掲載分/Mii +フレグランスオイル、ロックミルク",
  "conte_slots": 9,
  "telops": 6,
  "assets": {

@@ -39,7 +39,7 @@ user-invokable: true
 | `assets/telop_3slot_v22.mogrt` | テロップの正本テンプレ（★v20は使わない） |
 | `assets/1f447.png` / `1f364.png` | 👇 と 🍤（Twemoji 72×72） |
 | `assets/MCPBridgeCEP/` | ★**CEP Bridge 拡張の実体**（framework には入っていない） |
-| `scripts/pr.sh` | jsx の投入スクリプト |
+| `skill/donki-feriest/scripts/pr.sh` | jsx の投入スクリプト（★正本。framework 側のコピーはトークン解決を持たない）|
 
 **framework から切り出した判断の正本16本**は `../_framework_minimal/` にある（`MINIMAL-SET.md` 参照）。
 

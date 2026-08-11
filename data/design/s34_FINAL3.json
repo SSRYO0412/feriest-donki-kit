@@ -2,8 +2,8 @@
  "_provenance": {
   "pass_id": "s34_select_v1",
   "date": "2026-08-08",
-  "db": "/Volumes/Extreme SSD/FERIEST/01_assets/db_202608/feriest_202608_v5_fix.sqlite",
-  "slots": "/Volumes/Extreme SSD/FERIEST/01_assets/db_202608/s1_slot_score_v6.json",
+  "db": "@@FERIEST_ROOT@@/01_assets/db_202608/feriest_202608_v5_fix.sqlite",
+  "slots": "@@FERIEST_ROOT@@/01_assets/db_202608/s1_slot_score_v6.json",
   "weights": {
    "semantic": 45,
    "framing": 15,

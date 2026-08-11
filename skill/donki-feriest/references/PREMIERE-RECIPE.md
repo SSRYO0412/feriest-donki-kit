@@ -10,8 +10,12 @@
 4. **Start Bridge を押す**
 
 ```bash
-cd ~/.claude/skills/premiere-bridge-ops/scripts && bash pr.sh <script.jsx> 60000
+bash skill/donki-feriest/scripts/pr.sh <script.jsx> 60000
 ```
+
+★**正本はキット内の `skill/donki-feriest/scripts/pr.sh`。**
+`skills/premiere-bridge-ops/scripts/pr.sh`（framework 由来・編集禁止レイヤ）は
+トークン解決を持たないので、案件 jsx を投げると `@@FERIEST_ROOT@@` が生のまま Premiere に届く。
 
 ★**ブリッジが止まると外部から再開できない。** ユーザーに押してもらうしかない。
 再開前に**未消費の `command-*.json` を必ず消す**（溜まった分が一気に実行される）。
@@ -32,11 +36,11 @@ if(proj.documentID===REF) return "★★★中断: 参考と同一ID";
 
 | | |
 |---|---|
-| prproj | `/Volumes/Extreme SSD/FERIEST/02_work/premiere/FERIEST_0801_ebi_v1.prproj` |
+| prproj | `work/premiere/FERIEST_0801_ebi_v1.prproj`（キット同梱。素材は `FERIEST_ROOT` から自動再リンク）|
 | documentID | `3ea1839d-a639-48ba-acae-e0d506adfd39` |
 | シーケンス | `0801_ebi` / **1080×1920 / 30fps / 337F = 11.233秒** |
 | 版の退避 | `02_work/premiere/prproj_versions/`（★開かない） |
-| スクリプト | `02_work/premiere/jsx_20260809/`（98本・全部残っている） |
+| スクリプト | `work/jsx_20260809/`（98本・キット同梱。パスはトークン化・v20参照5本は `_rejected/`）|
 | 解析出力 | `02_work/ref_analysis/premiere_20260809/` |
 | 検証書き出し | `02_work/premiere/verify_20260809/`（★納品物ではない） |
 
@@ -123,7 +127,9 @@ p.addKey(OFF+(NF-1)/30);  p.setValueAtKey(OFF+(NF-1)/30,115,true);
 ## 6. 書き出し
 
 ```javascript
-var EPR="/Applications/Adobe Media Encoder 2026/Adobe Media Encoder 2026.app/Contents/MediaIO/systempresets/3F3F3F3F_4D6F6F56/H264 Match Source - High bitrate.epr";
+// ★AME のパスはバージョンで変わる。決め打ちにすると他マシンで書き出しが全滅する。
+// pr.sh が投入直前に @@AME_PRESET@@ を実パスへ置換する（未検出なら投入せず落ちる）。
+var EPR="@@AME_PRESET@@";
 seq.setInPoint(T(0)); seq.setOutPoint(T(337*TPF));
 seq.exportAsMediaDirect(dst, EPR, 1);   // workAreaType 1 = イン〜アウト
 ```
