@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """映像管理Notionプロジェクトの共有モデル（notion-db-contract.md の実装補助）。
 
-- プロジェクトページID → DB役割(role)の解決（テンプレ複製・VERARUS等、命名ゆれをタイトル部分一致で吸収）
+- プロジェクトページID → DB役割(role)の解決（テンプレ複製・案件V等、命名ゆれをタイトル部分一致で吸収）
 - プロパティ別名（テンプレ名 vs 案件名の差を吸収。例: 採用MP4パス ⇔ 現在の採用MP4）
 - rollback_log.jsonl 付き patch（変更前値を記録してから書く。notion_rollback.py が逆適用）
 - キー文法regex（契約 §1）

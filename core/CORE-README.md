@@ -87,11 +87,11 @@ symlink の実体であるメインチェックアウトは **9コミット古�
 | `swap3/` | swap系3スキル | kling_person_swap.py（frontal_image_url 修正版） |
 | `faithful_lp/` | faithful / lp | person-swap・BEFOREAFTER_RULES（汎用品質版）・jp-locations・parallel-mass-production・clone-from-reference・conditional-techniques・mass_*_parallel.sh |
 | `PRINCIPLES.md` | 全7スキル（capcut含む）の references/ | 横断原則（実測主義・検証の鉄則・閉ループ選別・並列安全策・承認ゲート） |
-| `revision/` | video-revision-db-workflow / verarus-video-revision-workflow / verarus-ad-production | **バージョン管理・履歴保全の正本**（2026-07-11 追加）: VERSIONING.md（命名/ディレクトリ/履歴書式/更新トリガー/納品規約）・revision-checklist.md・check_adoption_sync.py（採用v突合検算）・check_variant_dupes.py（素材重複機械チェック）・new_revision_project.py（修正案件スカフォールド） |
-| `selection/` | footage-asset-db / verarus-ad-production | **台本→素材選定・検証の正本**（2026-07-11 追加）: SELECTION_PROTOCOL.md（意味カテゴリ分類→基準表→台帳→二重検証・主張タイプ分類表・フック伝達力検証）・verified_clips.template.json（検証済みクリップ台帳スキーマ）・asset-db-queries.template.md（案件別クエリ集の雛形） |
-| `compilation/` | verarus-ad-production | **ffmpegコンピレーション広告編集の正本**（2026-07-11 追加）: telop-ffmpeg-compilation.md（boxblur汚染/グロー濃度/concat無音化の3大バグと正解）・build_compilation.py（汎用ビルドハーネス。数値は案件ごと実測して設定） |
+| `revision/` | video-revision-db-workflow / 案件V-video-revision-workflow / project-v-ad-production | **バージョン管理・履歴保全の正本**（2026-07-11 追加）: VERSIONING.md（命名/ディレクトリ/履歴書式/更新トリガー/納品規約）・revision-checklist.md・check_adoption_sync.py（採用v突合検算）・check_variant_dupes.py（素材重複機械チェック）・new_revision_project.py（修正案件スカフォールド） |
+| `selection/` | footage-asset-db / project-v-ad-production | **台本→素材選定・検証の正本**（2026-07-11 追加）: SELECTION_PROTOCOL.md（意味カテゴリ分類→基準表→台帳→二重検証・主張タイプ分類表・フック伝達力検証）・verified_clips.template.json（検証済みクリップ台帳スキーマ）・asset-db-queries.template.md（案件別クエリ集の雛形） |
+| `compilation/` | project-v-ad-production | **ffmpegコンピレーション広告編集の正本**（2026-07-11 追加）: telop-ffmpeg-compilation.md（boxblur汚染/グロー濃度/concat無音化の3大バグと正解）・build_compilation.py（汎用ビルドハーネス。数値は案件ごと実測して設定） |
 | `telop/` | short-telop-craft / reference-video-clone / short-video-pipeline | **テロップ完全再現・アニメ実装の正本**（2026-08-03 追加・Dec28_01から抽象化）: TELOP-CRAFT.md（区間定義→定常フレーム実測→テンプレートマッチング動き実測→PNGレンダー(base/emph分離)→Premiere配置+アニメ(敷き直し集約)→書き出し画素検証。測定器の罠3種・エフェクト実測値表・出現アニメ基本型） |
-| `vo/` | verarus-ad-production / audio-emotion-voice-clone | **VO再構築・話速/音量修正の正本**（2026-07-11 追加）: onvoice-recipe.md（VO同期再構築の手順枠）・telop-pace-volume-method.md（全行一律retime・反復確定・RMS均一化・font_size_overrides） |
+| `vo/` | project-v-ad-production / audio-emotion-voice-clone | **VO再構築・話速/音量修正の正本**（2026-07-11 追加）: onvoice-recipe.md（VO同期再構築の手順枠）・telop-pace-volume-method.md（全行一律retime・反復確定・RMS均一化・font_size_overrides） |
 
 ## 同期対象外（意図的にスキルごとに違うもの — 触るときは各スキルで個別に）
 - `scripts/build.py`（RVC=verdict部分一致修正 / faceless系=faceless版 / interview=文節分割・二重字幕対策入り270行 — パイプラインが違うため別実装）
