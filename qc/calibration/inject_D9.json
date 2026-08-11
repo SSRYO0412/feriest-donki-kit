@@ -2,7 +2,7 @@
  "gate": "G90",
  "name": "参考突合（瓜二つ判定）",
  "video_id": "0801",
- "build": "/var/folders/xp/6g5pm9911fg_1_01wdqlvx0c0000gn/T/calib_wpd9cj4v/build_D9.json",
+ "build": "/var/folders/xp/6g5pm9911fg_1_01wdqlvx0c0000gn/T/calib_ozl86a46/build_D9.json",
  "mp4": "data/baseline/0801_baseline_v9.mov",
  "reference": "0.7人前うどん",
  "verdict": "FAIL",

@@ -15,6 +15,10 @@
 ## 30秒で確かめる
 
 ```bash
+# 手元の原本と結べているか（別マシンでは最初にここ）
+cp .feriest-paths.example .feriest-paths   # FERIEST_ROOT を自分の場所に書き換える
+python3 scripts/check_links.py
+
 # 参考と瓜二つか（完成MP4の画素を実測して参考の実測値と突合）
 python3 scripts/reference_match.py \
   --build design/build_0801.json \
@@ -60,6 +64,15 @@ projects/                0801〜0805 の動画別プロファイル（生成物�
 scripts/
   reference_match.py     ★G90 参考突合。完成MP4の画素で測る
   calibration_harness.py ★G92 較正ハーネス。検出率を実測する
+  resolve_paths.py       トークン（@@FERIEST_ROOT@@ 等）を実パスへ解決する
+  check_links.py         ★手元の原本が引けるか検査（Premiereを開く前に通す）
+
+work/                    0801 を実際に組んだ現物
+  jsx_20260809/          案件 jsx 98本（絶対パスはトークン化済み）
+    _rejected/           ★v20 参照の却下版5本。実行すると即中断する
+  premiere/              作業 prproj（採用版＋却下版）
+
+.feriest-paths.example   パス設定の雛形（写して .feriest-paths を作る）
 core/ skills/            framework由来（★編集禁止レイヤ）
 skill/donki-feriest/     案件スキル（references 7本 + MOGRT + Twemoji + CEP Bridge）
 data/

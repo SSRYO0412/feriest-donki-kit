@@ -3,7 +3,7 @@
  "_generated_by": ".fork/gen_projects.py",
  "video_id": "0801",
  "product": "海老ドーン贅沢ぷりぷり海老マヨピザ",
- "media_dir": "/Volumes/Extreme SSD/FERIEST/00_source_drive/20260807_新素材_8月掲載分/海老ドーン贅沢ぷりぷり海老マヨピザ",
+ "media_dir": "@@FERIEST_ROOT@@/00_source_drive/20260807_新素材_8月掲載分/海老ドーン贅沢ぷりぷり海老マヨピザ",
  "conte_slots": 9,
  "telops": 7,
  "assets": {
@@ -31,7 +31,7 @@
  "no_material": [],
  "_no_material_note": "★全数検索で不在を確定済み。『探せば見つかる』と誤認しない",
  "status": "built",
- "prproj": "/Volumes/Extreme SSD/FERIEST/02_work/premiere/FERIEST_0801_ebi_v1.prproj",
+ "prproj": "@@FERIEST_ROOT@@/02_work/premiere/FERIEST_0801_ebi_v1.prproj",
  "sequence": "0801_ebi",
  "document_id": "3ea1839d-a639-48ba-acae-e0d506adfd39",
  "version": "v7",

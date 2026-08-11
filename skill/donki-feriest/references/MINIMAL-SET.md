@@ -6,12 +6,15 @@
 
 | | 状態 |
 |---|---|
-| **SSD の中身**（素材・4,658窓のDB・構成設計・参考分析・prproj・jsx 98本） | ✅ **全部ある** |
+| **原本フッテージ**（227本・38GB） | ⚠️ **リポジトリに入らない**。手元の原本を `FERIEST_ROOT` で指す（`scripts/check_links.py` で検査）|
+| **案件 jsx 98本** | ✅ `work/jsx_20260809/` に**同梱済み**（絶対パスはトークン化・v20参照5本は `_rejected/`）|
+| **作業 prproj**（0801 採用版＋却下版） | ✅ `work/premiere/` に**同梱済み**（`<RelativePath>` 保持で自動再リンク）|
+| **SSD の中身**（窓DB・構成設計・参考分析） | ✅ リポジトリに同梱済み |
 | **MOGRT `telop_3slot_v22.mogrt`** | ✅ このスキルの `assets/` に**同梱済み** |
 | **Twemoji `1f447.png` / `1f364.png`** | ✅ 同梱済み |
 | **CEP Bridge 拡張**（100KB・5ファイル） | ✅ `assets/MCPBridgeCEP/` に**同梱済み** |
 | **`pr.sh`**（jsx投入スクリプト） | ✅ `scripts/pr.sh` に**同梱済み** |
-| **判断の正本 15ファイル**（下記） | ❌ **framework 側にある。要取得** |
+| **判断の正本 15ファイル**（下記） | ✅ **このキットに同梱済み**（`core/` と `skills/` に全15本。実在を検算済み 2026-08-11）|
 | **フォント3種** | ❌ Adobe Fonts で有効化（マシン側） |
 
 ★**CEP Bridge は video-ops-framework に入っていません。**
@@ -24,7 +27,7 @@
 
 ```bash
 # 1. 拡張を配置
-ditto "/Volumes/Extreme SSD/FERIEST/_skill/donki-feriest/assets/MCPBridgeCEP" \
+ditto "skill/donki-feriest/assets/MCPBridgeCEP" \
       "$HOME/Library/Application Support/Adobe/CEP/extensions/MCPBridgeCEP"
 
 # 2. ★未署名拡張を許可（これが無いとパネルが出ない）
@@ -54,9 +57,10 @@ defaults write com.adobe.CSXS.12 PlayerDebugMode 1
 
 ---
 
-## 2. framework から取り出す最小セット（15ファイル・306KB）
+## 2. 判断の正本 15ファイル（すべて同梱済み）
 
-repo 全体は 437ファイル・33MB。**この案件に必要なのは以下だけ**です。
+★以前は「framework から取り出す」手順だったが、**このキットは15本とも既に含んでいる**。
+下の表は「どれが効くか」を示す索引として残す。取り出し作業は不要。
 
 ### A. Premiere を触るなら必須（4ファイル）
 
@@ -110,7 +114,7 @@ repo 全体は 437ファイル・33MB。**この案件に必要なのは以下�
 
 ---
 
-## 3. 取り出しコマンド
+## 3. 取り出しコマンド（★不要。framework しか無い環境へ渡すとき用に残す）
 
 ```bash
 SRC=~/video-ops-framework
@@ -122,7 +126,8 @@ for f in \
   skills/premiere-bridge-ops/references/VERIFY-METHOD.md \
   skills/premiere-bridge-ops/references/TELOP-WORKFLOW.md \
   skills/premiere-bridge-ops/references/DESIGN-BOUNDARY.md \
-  skills/premiere-bridge-ops/scripts/pr.sh \
+  skill/donki-feriest/scripts/pr.sh \
+
   core/telop/references/TELOP-CRAFT.md \
   skills/reference-video-clone/references/CUT-QC-RULES.md \
   core/revision/references/REVISION-LEDGER.md \
@@ -162,12 +167,14 @@ cd ~/video-ops-framework && bash core/ops/scripts/install.sh
 ## 5. 依存関係のまとめ
 
 ```
-                    ┌─ 素材・窓DB・構成設計・参考分析・prproj・jsx
-    SSD ────────────┤
-                    ├─ MOGRT v22 / Twemoji / CEP拡張 / pr.sh   ← 同梱済み
+    このキット ─────┬─ 窓DB・構成設計・参考分析・conte
+                    ├─ 案件 jsx 98本（work/jsx_20260809/・トークン化済み）
+                    ├─ 作業 prproj（work/premiere/・RelativePath 保持）
+                    ├─ MOGRT v22 / Twemoji / CEP拡張 / pr.sh
+                    ├─ 判断の正本 15ファイル（core/ と skills/）
                     └─ この案件専用スキル（donki-feriest）
 
-    framework ──────── 判断の正本 15ファイル（306KB）
+    手元の原本 ─────── フッテージ 227本・38GB（FERIEST_ROOT で指す）
 
     マシン ─────────┬─ Premiere Pro 2026 + Adobe Media Encoder
                     ├─ Adobe Fonts: mplus-1p-heavy / HeiseiMinStd-W9 / Makinas-4-Square

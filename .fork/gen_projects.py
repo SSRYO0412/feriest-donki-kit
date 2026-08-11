@@ -52,7 +52,7 @@ NO_MATERIAL = {
 
 BUILT = {
     "0801": {"status": "built",
-             "prproj": "/Volumes/Extreme SSD/FERIEST/02_work/premiere/FERIEST_0801_ebi_v1.prproj",
+             "prproj": "@@FERIEST_ROOT@@/02_work/premiere/FERIEST_0801_ebi_v1.prproj",
              "sequence": "0801_ebi",
              "document_id": "3ea1839d-a639-48ba-acae-e0d506adfd39",
              "version": "v7",

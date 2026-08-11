@@ -1,0 +1,13 @@
+# .feriest-paths — このマシンでのパス設定（コピーして .feriest-paths にする）
+#
+# 案件 jsx（work/jsx_20260809/）のトークンを実パスへ解決するために pr.sh が読む。
+# 環境変数が設定されていればそちらが優先される。
+
+# 素材SSDの根。この下に 00_source_drive/ と 02_work/premiere/ がある前提。
+# ★prproj は相対パス(<RelativePath>)も持っているので、この2階層の位置関係さえ
+#   保たれていれば Premiere が自動でメディアを再リンクする。
+FERIEST_ROOT="/Volumes/Extreme SSD/FERIEST"
+
+# 書き出しプリセット。未設定なら /Applications/Adobe Media Encoder */ から自動検出する。
+# バージョンが特殊な場所にある場合だけ明示する。
+# AME_PRESET="/Applications/Adobe Media Encoder 2026/Adobe Media Encoder 2026.app/Contents/MediaIO/systempresets/3F3F3F3F_4D6F6F56/H264 Match Source - High bitrate.epr"

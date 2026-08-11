@@ -1,6 +1,14 @@
-import json, sys
-SRC="/Users/sasakiryo/video-ops-framework/skills/short-video-qc/references/gates.template.json"
-DST="/Users/sasakiryo/feriest-donki-kit/.fork/gates.json"
+import json, os, sys
+
+# ★パスをマシンに依存させない。雛形はこのキットに同梱してある（skills/short-video-qc/）。
+#   framework 側の新しい雛形を使いたいときだけ GATES_TEMPLATE で明示する。
+KIT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SRC = os.environ.get(
+    "GATES_TEMPLATE",
+    os.path.join(KIT_ROOT, "skills/short-video-qc/references/gates.template.json"))
+DST = os.path.join(KIT_ROOT, ".fork/gates.json")
+if not os.path.exists(SRC):
+    sys.exit("雛形が見つかりません: %s\n  → GATES_TEMPLATE=/path/to/gates.template.json で指定してください" % SRC)
 t=json.load(open(SRC,encoding="utf-8"))
 
 # --- 12レンズ（既存アナリスト7本を土台に、今回追加分を足す） ---
@@ -112,6 +120,17 @@ t["_fork"]={
   "changes":"Codex実施12ゲート → 隔離Claude。G50/51/52 を12レンズ×3ラウンド=36レビューへ展開。G90/G91/G92 を新設",
   "review_count": len(LENSES)*3,
 }
+# ★Codex不在フォークとしての言い換え。
+#   これを生成器に持たせないと、コミット済み gates.json を再現できない
+#   （2026-08-11 に発覚: gates.json 側だけ手で直されていて、生成器を回すと差し戻っていた）。
+#   雛形は framework 由来の編集禁止レイヤなので、書き換えはこの .fork 層で行う。
+RENAME=[("Codex観察","独立観察"), ("Codex指摘箇所","独立レビューの指摘箇所")]
+for g in t["gates"]:
+    for k,v in list(g.items()):
+        if isinstance(v,str):
+            for a,b in RENAME: v=v.replace(a,b)
+            g[k]=v
+
 json.dump(t, open(DST,"w",encoding="utf-8"), ensure_ascii=False, indent=2)
 print(f"ゲート {len(t['gates'])} 本 / 独立レビュー {len(LENSES)*3} 回")
 codex_left=[g["id"] for g in new if "codex" in json.dumps(g,ensure_ascii=False).lower()]

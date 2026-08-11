@@ -4,7 +4,9 @@
 
 ## 1. 素材DBの場所
 
-**`/Volumes/Extreme SSD/FERIEST/01_assets/db_202608/feriest_202608_v5_fix.sqlite`**
+**キット同梱**: `data/asset_db/feriest_0801-0805_windows.sqlite`（テーブル `asset_windows_v2` / 3,774窓）
+
+元になった全案件DB（キットには入っていない）: `@@FERIEST_ROOT@@/01_assets/db_202608/feriest_202608_v5_fix.sqlite`
 
 ★**v5_fix が正本**。v1〜v4 は工程途中の版（残してあるが使わない）。
 
@@ -36,7 +38,7 @@
 ## 3. 引き方の例
 
 ```bash
-DB="/Volumes/Extreme SSD/FERIEST/01_assets/db_202608/feriest_202608_v5_fix.sqlite"
+DB="data/asset_db/feriest_0801-0805_windows.sqlite"   # キット同梱（テーブルは asset_windows_v2）
 
 # 商材の全窓を一覧化（★選定前に必ず全部読む）
 sqlite3 -separator '|' "$DB" "
@@ -92,7 +94,9 @@ ffmpeg -hide_banner -v error -ss <tin> -t <dur> -i <src> \
 
 ## 5. 素材の原本
 
-`/Volumes/Extreme SSD/FERIEST/00_source_drive/20260807_新素材_8月掲載分/<商材フォルダ>/`
+`$FERIEST_ROOT/00_source_drive/20260807_新素材_8月掲載分/<商材フォルダ>/`
+
+★手元の原本が引けるかは `python3 scripts/check_links.py` で検査する。
 
 ★**読み取り専用。絶対に編集しない。**
 ★プロキシ（`01_assets/db_202608/proxy/`）で**書き出さない**。実測も原本で行う。

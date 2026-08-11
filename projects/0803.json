@@ -3,7 +3,7 @@
  "_generated_by": ".fork/gen_projects.py",
  "video_id": "0803",
  "product": "おうちでライブマイク",
- "media_dir": "/Volumes/Extreme SSD/FERIEST/00_source_drive/20260807_新素材_8月掲載分/おうちでライブマイク",
+ "media_dir": "@@FERIEST_ROOT@@/00_source_drive/20260807_新素材_8月掲載分/おうちでライブマイク",
  "conte_slots": 10,
  "telops": 6,
  "assets": {

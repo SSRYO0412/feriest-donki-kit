@@ -29,11 +29,12 @@
     "_honest_note": "★モデル多様性は回復していない。隔離とレンズ分割で埋まるのは共有文脈バイアスであって、同一モデルの盲点ではない。残余は G92 較正ハーネスの実測値で報告する"
   },
 
-  "root": "/Volumes/Extreme SSD/FERIEST",
+  "root": "@@FERIEST_ROOT@@",
   "_root_note": "★作業は必ずSSD側。~/.claude 配下では作業しない（削除される）。00_source_drive/ は読み取り専用",
+  "_token_note": "★@@FERIEST_ROOT@@ はマシン依存の根。実パスは env FERIEST_ROOT / .feriest-paths / 既定値 の順で解決する（scripts/resolve_paths.py・skill/donki-feriest/scripts/pr.sh）。トークンのまま持つことで projects/*.json の生成がマシン非依存になり gen_projects.py --check がどの環境でも通る",
 
   "source": {
-    "media_root": "/Volumes/Extreme SSD/FERIEST/00_source_drive/20260807_新素材_8月掲載分",
+    "media_root": "@@FERIEST_ROOT@@/00_source_drive/20260807_新素材_8月掲載分",
     "_media_note": "★このフォルダは読み取り専用。ここから直接編集しない",
     "asset_db": "data/asset_db/feriest_0801-0805_windows.sqlite",
     "asset_db_table": "asset_windows_v2",
