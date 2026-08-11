@@ -1,0 +1,284 @@
+{
+ "project": "",
+ "created_at": "",
+ "qc_profile": {
+  "_note": "QCプロファイル（2026-08-10 新設・PROJECT-ROUTER Q4）。案件開始時にユーザー承認して確定する契約。FULL=全ゲート／DELTA=シリーズ2本目以降（機械ゲート全数＋変更点まわり全数目視＋sample_every_n本に1本FULL）／TRIAL=社内試作（機械ゲート＋G19のみ・報告見出しに『納品不可』固定）。三大禁止は全プロファイル共通。approved_by が空のまま DELTA/TRIAL で走ることは許されない",
+  "profile": "FULL",
+  "approved_by": "",
+  "approved_at": "",
+  "sample_every_n": 5,
+  "series_first_video_id": ""
+ },
+ "universal_thresholds": {
+  "_note": "★ユニバーサルゲート数値の単一正本（既定値・2026-07-30 D3決定）。案件のproject.json thresholdsの実測値が上書きする。他ドキュメント中の数値は例示であり、食い違ったらここが正。詰める側（設計）と検品側は必ず同じ値を読む",
+  "min_shot_sec": 0.4,
+  "max_silence_sec": 0.25,
+  "broll_gap_min_frames": 20,
+  "waveform_step_max": 0.06,
+  "telop_sync_max_sec": 0.3,
+  "min_insert_sec": 1.5,
+  "still_max_sec": 0.5,
+  "same_cluster_consecutive": 0,
+  "same_material_same_span_reuse": 0,
+  "black_frames": 0,
+  "orphan_frames": 0,
+  "cut_inside_word": 0,
+  "join_not_phrase_head": 0,
+  "telop_midword_break": 0,
+  "_note_発話の切れ目": "★2026-07-31追加（18_ACTY_R4）。発話の切れ目は3層で見る。1層目だけでは足りない。cut_inside_word=切り位置が語のstart-endの内側に落ちている件数。join_not_phrase_head=継ぎ目で発話を捨てている場合に次カットの先頭が助詞・助動詞・接尾辞・補助記号で始まっている件数（前の句の続きになっている）。★『地続き＝発話を1語も捨てていない』継ぎ目は句の途中で終わっていても常にOK。地続きの判定を無音の長さで行わないこと（0.05秒などで切ると、語を捨てていない継ぎ目を誤って『捨てている』側に数える）。telop_midword_break=テロップが単語の途中で改行・分割されている枚数（折り返しは文節頭→語境界の順で探し、文字数二分は使わない）。"
+ },
+ "gates": [
+  {
+   "id": "G00",
+   "name": "参考動画ハッシュ照合",
+   "executor": "claude",
+   "tool": "sha256sum",
+   "evidence": "qc/ref_hash.json",
+   "pass_condition": "目標値ファイルのsource_video_sha256と一致",
+   "status": "pending"
+  },
+  {
+   "id": "G01",
+   "name": "参考の全数写経の存在確認",
+   "executor": "claude",
+   "tool": "validator",
+   "evidence": "ref_telop_grammar.json",
+   "pass_condition": "旧形式（ref_telop_grammar.json+ref_cut_grammar.json）またはTIMELINE-SHEET形式（style_profile.json+telop_ledger.json+1秒シート）のどちらかが存在し全数（2026-07-30二形式対応）",
+   "status": "pending"
+  },
+  {
+   "id": "G02",
+   "name": "動画種別と閾値の宣言",
+   "executor": "claude",
+   "tool": "validator",
+   "evidence": "qc/video_profile.json",
+   "pass_condition": "type と全閾値と根拠が埋まっている",
+   "status": "pending"
+  },
+  {
+   "id": "G03",
+   "name": "参照資産の存在・鮮度確認（突合・2026-07-30新設）",
+   "executor": "claude",
+   "tool": "validator+sha256",
+   "evidence": "qc/ref_assets.json",
+   "pass_condition": "style_profile.json / telop_ledger.json / 1秒シート(sheet_rows)が存在し、参照元動画ハッシュがG00と一致（参照駆動案件のみ・非該当はskip理由記録）",
+   "status": "pending"
+  },
+  {
+   "id": "G10",
+   "name": "スロット表の検査",
+   "executor": "claude",
+   "tool": "validator",
+   "evidence": "slots.json",
+   "pass_condition": "全ビート×5要素×candidates5件、seen/tempo_impact/why 完備",
+   "status": "pending"
+  },
+  {
+   "id": "G11",
+   "name": "被写体タグ重複検算",
+   "executor": "script",
+   "tool": "subject_dup",
+   "evidence": "qc/subject_dup.json",
+   "pass_condition": "同一タグ出現が subject_tag_max_repeat 以内",
+   "status": "pending"
+  },
+  {
+   "id": "G12",
+   "name": "判断記録の検査",
+   "executor": "claude",
+   "tool": "validator",
+   "evidence": "qc/decisions.json",
+   "pass_condition": "スキーマ適合（空でも可・ファイル必須）",
+   "status": "pending"
+  },
+  {
+   "id": "G13",
+   "name": "参照駆動の設計証跡検査（突合・2026-07-30新設）",
+   "executor": "claude",
+   "tool": "validator",
+   "evidence": "qc/refdriven_evidence.json",
+   "pass_condition": "スロット譜(slot_score)・3軸スコアカード・盲検A/B記録・conflict台帳・fidelity_contract が存在しスキーマ適合（参照駆動案件のみ）。台本なし案件は加えてscript-from-footage証跡（script.json・R1〜R10検算表・drop_appendix・supply_gap）",
+   "status": "pending"
+  },
+  {
+   "id": "G20",
+   "name": "素材全時間窓のCodex観察",
+   "executor": "codex",
+   "tool": "codex_parallel.sh(CLI 20並列)",
+   "evidence": "qc/codex_view/materials.json",
+   "pass_condition": "coverage_verify.py が PASS（全ファイル名の列挙を機械照合・欠番0）",
+   "status": "pending"
+  },
+  {
+   "id": "G21",
+   "name": "完成動画全フレームのCodex観察",
+   "executor": "codex",
+   "tool": "codex_parallel.sh(CLI 20並列)",
+   "evidence": "qc/codex_view/frames.json",
+   "pass_condition": "coverage_verify.py が PASS（全ファイル名の列挙を機械照合・欠番0）",
+   "status": "pending"
+  },
+  {
+   "id": "G22",
+   "name": "テロップ全枚数のCodex観察",
+   "executor": "codex",
+   "tool": "codex_parallel.sh(CLI 20並列)",
+   "evidence": "qc/codex_view/telops.json",
+   "pass_condition": "coverage_verify.py が PASS（全ファイル名の列挙を機械照合・欠番0）",
+   "status": "pending"
+  },
+  {
+   "id": "G23",
+   "name": "Claude要点読み",
+   "executor": "claude",
+   "tool": "Read",
+   "evidence": "qc/claude_seen.json",
+   "pass_condition": "境界±2F/テロップ出現消滅±2F/Codex指摘箇所を網羅",
+   "status": "pending"
+  },
+  {
+   "id": "G24",
+   "name": "捏造検出",
+   "executor": "script",
+   "tool": "evidence_scan.py",
+   "evidence": "qc/evidence_report.json",
+   "pass_condition": "seen申告と実Readの不一致0件",
+   "status": "pending"
+  },
+  {
+   "id": "G25",
+   "name": "並列観察の被覆照合",
+   "executor": "script",
+   "tool": "coverage_verify.py",
+   "evidence": "qc/coverage_report.json",
+   "pass_condition": "欠番0枚。欠番スライスは再実行して再照合",
+   "status": "pending"
+  },
+  {
+   "id": "G30",
+   "name": "機械検査",
+   "executor": "script",
+   "tool": "qc_machine.py",
+   "evidence": "qc/machine_report.json",
+   "pass_condition": "全項目0件",
+   "status": "pending"
+  },
+  {
+   "id": "G31",
+   "name": "完成音声の再文字起こし照合",
+   "executor": "claude",
+   "tool": "faster-whisper",
+   "evidence": "qc/speech_report.json",
+   "pass_condition": "語切断0・同期ズレ0・固有名詞は単独切り出しで裏取り済み",
+   "status": "pending"
+  },
+  {
+   "id": "G32",
+   "name": "使用窓のDB突合（突合・2026-07-30新設）",
+   "executor": "script+claude",
+   "tool": "windows.py query / SQL",
+   "evidence": "qc/window_crosscheck.json",
+   "pass_condition": "全採用窓がconfirmed行／DB既知のNG・切れ・映り込み窓との交差0件／検品発見の還流(windows.py set)実施記録あり",
+   "status": "pending"
+  },
+  {
+   "id": "G40",
+   "name": "テンポ5段階判定",
+   "executor": "claude+codex",
+   "tool": "TEMPO.md",
+   "evidence": "qc/tempo_report.json",
+   "pass_condition": "全超過区間に5択スコア、(e)はcodex_approval付き",
+   "status": "pending"
+  },
+  {
+   "id": "G41",
+   "name": "完成品での軸2再実測（突合・2026-07-30新設）",
+   "executor": "script+codex",
+   "tool": "axis_scorecard + 1秒グリッド横並び",
+   "evidence": "qc/axis2_final.json",
+   "pass_condition": "レンダー後MP4でリズムz値・肝TOP3全数検査・1秒グリッド参考横並び([R6])を再計算しS7時点と乖離なし（参照駆動案件のみ）",
+   "status": "pending"
+  },
+  {
+   "id": "G50",
+   "name": "Codexレビュー①設計案",
+   "executor": "codex",
+   "tool": "丸投げ(gpt-5.5)",
+   "evidence": "qc/codex_review_design.json",
+   "pass_condition": "全指摘に採用/却下+理由",
+   "status": "pending"
+  },
+  {
+   "id": "G51",
+   "name": "Codexレビュー②テロップ",
+   "executor": "codex",
+   "tool": "丸投げ(gpt-5.5)",
+   "evidence": "qc/codex_review_telop.json",
+   "pass_condition": "全指摘に採用/却下+理由",
+   "status": "pending"
+  },
+  {
+   "id": "G52",
+   "name": "Codexレビュー③完成全フレーム",
+   "executor": "codex",
+   "tool": "丸投げ(gpt-5.5)",
+   "evidence": "qc/codex_review_final.json",
+   "pass_condition": "全指摘に採用/却下+理由",
+   "status": "pending"
+  },
+  {
+   "id": "G53",
+   "name": "テロップpx照合（突合・2026-07-30新設）",
+   "executor": "script+claude",
+   "tool": "measure_telop_px × telop_ledger",
+   "evidence": "qc/telop_px_check.json",
+   "pass_condition": "全テロップのfill/縁色/字高/中心座標がtelop_ledger仕様と一致・入りアニメ±3F確認（telop_mode=premiere時=[8.5]のゲート化）",
+   "status": "pending"
+  },
+  {
+   "id": "G60",
+   "name": "相互整合チェック",
+   "executor": "script+codex",
+   "tool": "全ルール再評価",
+   "evidence": "qc/consistency_report.json",
+   "pass_condition": "未解決の衝突0件",
+   "status": "pending"
+  },
+  {
+   "id": "G70",
+   "name": "採点サブエージェント",
+   "executor": "subagent",
+   "tool": "Agent",
+   "evidence": "qc/scoring/agent.json",
+   "pass_condition": "制作ログ非開示の3点のみで採点済み",
+   "status": "pending"
+  },
+  {
+   "id": "G71",
+   "name": "Codex独立採点",
+   "executor": "codex",
+   "tool": "丸投げ(gpt-5.5)",
+   "evidence": "qc/scoring/codex.json",
+   "pass_condition": "同3点で独立採点済み",
+   "status": "pending"
+  },
+  {
+   "id": "G72",
+   "name": "合議",
+   "executor": "subagent+codex",
+   "tool": "相互指摘の往復",
+   "evidence": "qc/scoring/final.json",
+   "pass_condition": "合意スコアと合意経緯が記録済み",
+   "status": "pending"
+  },
+  {
+   "id": "G80",
+   "name": "報告生成",
+   "executor": "script",
+   "tool": "make_report.py",
+   "evidence": "qc/report.md",
+   "pass_condition": "未実施0件のときのみ「完了」見出し",
+   "status": "pending"
+  }
+ ]
+}

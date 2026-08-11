@@ -1,0 +1,251 @@
+{
+ "_note": "型D（台本×演者）のノードグラフ雛形。台本という正解テキストが先に存在する。テロップは文字=台本・タイミング=ASR（表記マップで矯正）。裏側の会話・アドリブはscript_align の逸脱として機械検出される。+C（参考クローン）を重ねる場合は ref_analysis を有効化。",
+ "nodes": [
+  {
+   "name": "ref_analysis",
+   "deps": [],
+   "inputs": [
+    "in/reference.mp4"
+   ],
+   "outputs": [
+    "qc/reference_measured.json"
+   ],
+   "cmds": [
+    "<+C修飾のみ: TIMELINE-SHEET [R0]〜[R5]（1秒シート→style_profile.json）。結果をプロファイルのreference/ref_driven欄へ。参照駆動選定を使う場合は align_approval ノード（ビート整列承認=第3停止点）を[2]の前に追加。+C無しの案件はこのノードを削除>"
+   ]
+  },
+  {
+   "name": "audio_master",
+   "deps": [],
+   "inputs": [],
+   "outputs": [
+    "work/words.json",
+    "work/env.npy"
+   ],
+   "cmds": [
+    "<音声抽出とASR（案件スクリプト）>"
+   ]
+  },
+  {
+   "name": "script_align",
+   "deps": [
+    "audio_master"
+   ],
+   "inputs": [
+    "in/script.txt",
+    "work/words.json"
+   ],
+   "outputs": [
+    "qc/script_align.json"
+   ],
+   "cmds": [
+    "python3 ~/.claude/skills/_video-core/pipeline/scripts/script_align.py '{profile}' align"
+   ],
+   "qc": [
+    "python3 ~/.claude/skills/_video-core/pipeline/scripts/script_align.py '{profile}' check"
+   ]
+  },
+  {
+   "name": "cutlist",
+   "deps": [
+    "script_align"
+   ],
+   "inputs": [
+    "qc/script_align.json",
+    "work/words.json",
+    "work/env.npy"
+   ],
+   "outputs": [
+    "work/cutlist.json",
+    "qc/timeline_map.json"
+   ],
+   "cmds": [
+    "<テイク選定（script_alignのテイク一覧から各行の最良テイクを選ぶ）＋逸脱の採否反映（案件スクリプト）>"
+   ],
+   "qc": [
+    "<繋いだ音声の実測検証＋台本カバレッジ再検査>"
+   ]
+  },
+  {
+   "name": "sheet",
+   "deps": [
+    "cutlist",
+    "broll"
+   ],
+   "inputs": [
+    "work/cutlist.json",
+    "work/broll.json"
+   ],
+   "outputs": [
+    "qc/sheet_rows.json"
+   ],
+   "cmds": [
+    "python3 ~/.claude/skills/_video-core/pipeline/scripts/notion_sheet.py '{profile}' generate"
+   ]
+  },
+  {
+   "name": "sheet_approval",
+   "deps": [
+    "cutlist",
+    "broll",
+    "sheet"
+   ],
+   "inputs": [
+    "work/cutlist.json",
+    "work/broll.json"
+   ],
+   "outputs": [],
+   "cmds": [],
+   "approval": "sheet"
+  },
+  {
+   "name": "final_words",
+   "deps": [
+    "cutlist"
+   ],
+   "inputs": [
+    "work/cutlist.json"
+   ],
+   "outputs": [
+    "work/final_words.json"
+   ],
+   "cmds": [
+    "<完成音声の窓分割再文字起こし（タイミング取得用。文字の正は台本）>"
+   ]
+  },
+  {
+   "name": "telops",
+   "deps": [
+    "final_words",
+    "sheet_approval"
+   ],
+   "inputs": [
+    "work/final_words.json",
+    "work/cutlist.json"
+   ],
+   "outputs": [
+    "work/telops.json"
+   ],
+   "cmds": [
+    "<テロップ生成: 文字=台本×表記マップで矯正・タイミング=final_words・文節頭切り>",
+    "<カット境界スナップ>"
+   ]
+  },
+  {
+   "name": "telop_png",
+   "deps": [
+    "telops"
+   ],
+   "inputs": [
+    "work/telops.json"
+   ],
+   "outputs": [
+    "work/telop_manifest.json"
+   ],
+   "cmds": [
+    "<スタイル割当>",
+    "<PNG焼き（実フォント幅折り）>"
+   ]
+  },
+  {
+   "name": "broll",
+   "deps": [
+    "cutlist"
+   ],
+   "inputs": [
+    "work/cutlist.json",
+    "work/telops.json"
+   ],
+   "outputs": [
+    "work/broll.json"
+   ],
+   "cmds": [
+    "<挿入映像設計（末尾で qc_inserts を必ず呼ぶ）>"
+   ],
+   "qc": [
+    "python3 ~/.claude/skills/short-video-qc/scripts/qc_inserts.py {root}/work/broll.json {root}/work/telops.json --materials {root}/qc/materials_len.json --mention-map {root}/qc/mention_map.json"
+   ]
+  },
+  {
+   "name": "se",
+   "deps": [
+    "telop_png"
+   ],
+   "inputs": [
+    "work/telops.json"
+   ],
+   "outputs": [
+    "work/se.json"
+   ],
+   "cmds": [
+    "<SE配置（本文の語アンカー）>"
+   ]
+  },
+  {
+   "name": "proxy",
+   "deps": [
+    "telop_png",
+    "broll",
+    "se"
+   ],
+   "inputs": [
+    "work/cutlist.json",
+    "work/broll.json",
+    "work/telop_manifest.json",
+    "work/se.json"
+   ],
+   "outputs": [
+    "work/proxy.mp4"
+   ],
+   "cmds": [
+    "python3 ~/.claude/skills/_video-core/pipeline/scripts/render_proxy.py {profile}"
+   ]
+  },
+  {
+   "name": "g19_watch",
+   "deps": [
+    "proxy"
+   ],
+   "inputs": [
+    "work/proxy.mp4"
+   ],
+   "outputs": [
+    "qc/watchthrough.txt"
+   ],
+   "cmds": [
+    "<agy通し視聴。★--print-timeout 20m 必須（既定5分では90秒動画の詳細視聴が切れる・実証済み）。結果をqc/watchthrough.txtへ>"
+   ]
+  },
+  {
+   "name": "watch_approval",
+   "deps": [
+    "g19_watch"
+   ],
+   "inputs": [
+    "work/proxy.mp4"
+   ],
+   "outputs": [],
+   "cmds": [],
+   "approval": "watch"
+  },
+  {
+   "name": "place",
+   "deps": [
+    "watch_approval"
+   ],
+   "inputs": [
+    "work/cutlist.json",
+    "work/broll.json",
+    "work/telop_manifest.json",
+    "work/se.json"
+   ],
+   "outputs": [],
+   "cmds": [
+    "<レンダラー別の配置（premiere/remotion/ffmpeg）>"
+   ],
+   "qc": [
+    "python3 ~/.claude/skills/_video-core/pipeline/scripts/timeline_diff.py '{profile}' diff"
+   ]
+  }
+ ]
+}

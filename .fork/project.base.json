@@ -1,0 +1,144 @@
+{
+  "_note": "★フォーク共通の案件プロファイル。5本すべてに効く値だけをここに置く。動画ごとに変わるものは projects/<id>.json 側。両者を .fork/resolve_project.py が合成して作業ルートの project.json を作る。",
+  "_schema_source": "core/pipeline/references/project-profile.template.json",
+  "_filled_at": "2026-08-11",
+  "project": "Feriest（ドン・キホーテ／株式会社PPIH）",
+  "type": "A",
+  "router": {
+    "_note": "PROJECT-ROUTER 5問の回答。★参考『0.7人前うどん』の様式を転写するので time_skeleton は reference-first。footage-first ではない（素材から時間を決めるのではなく、参考の尺・テンポに素材を当てる）",
+    "time_skeleton": "reference-first",
+    "_time_skeleton_reason": "参考のショット尺分布・shots_per_telop に合わせて骨格を先に決め、そこへ素材窓を割り当てた。0801は実際にこの順で作り直して改善した（6→10ショット）",
+    "strict_mode": true,
+    "strict_reason": "★Codexが無い環境で『検品通過』を名乗るため。独立レビューを12レンズ×3ラウンドに増やし、参考突合(G90)と較正ハーネス(G92)を合格条件に追加している（.fork/PROJECT-RULES.md §1）",
+    "qc_profile": "FULL",
+    "ledger_style": "per-video-db"
+  },
+  "roles": {
+    "_note": "★このフォークには Codex が無い。adversary から codex-gpt-5.5 を外し、隔離Claudeサブエージェントに置き換えた。viewer の agy も無いので Read による直接目視（人＋Claude）に倒す。埋まらない役割を要求する工程は『実行不能』を宣言して止まる——黙って省かない",
+    "viewer": [
+      "claude-read-frames",
+      "human"
+    ],
+    "adversary": [
+      "claude-isolated-subagent",
+      "human"
+    ],
+    "scorer": [
+      "claude-isolated-subagent",
+      "human"
+    ],
+    "machine": [
+      "local-python-ffmpeg"
+    ],
+    "_removed": {
+      "codex-gpt-5.5": "この環境に無い。G20/G21/G22/G40/G41/G60/G71 の実施者を差し替え済み（.fork/gen_gates.py）",
+      "agy": "この環境に無い。全フレーム目視は Read で1枚ずつ行う"
+    },
+    "_honest_note": "★モデル多様性は回復していない。隔離とレンズ分割で埋まるのは共有文脈バイアスであって、同一モデルの盲点ではない。残余は G92 較正ハーネスの実測値で報告する"
+  },
+  "root": "@@FERIEST_ROOT@@",
+  "_root_note": "★作業は必ずSSD側。~/.claude 配下では作業しない（削除される）。00_source_drive/ は読み取り専用",
+  "_token_note": "★@@FERIEST_ROOT@@ はマシン依存の根。実パスは env FERIEST_ROOT / .feriest-paths / 既定値 の順で解決する（scripts/resolve_paths.py・skill/donki-feriest/scripts/pr.sh）。トークンのまま持つことで projects/*.json の生成がマシン非依存になり gen_projects.py --check がどの環境でも通る",
+  "source": {
+    "media_root": "@@FERIEST_ROOT@@/00_source_drive/20260807_新素材_8月掲載分",
+    "_media_note": "★このフォルダは読み取り専用。ここから直接編集しない",
+    "conte": "data/conte/conte.json",
+    "_conte_note": "★クライアント赤入れ後の確定内容。文言は一字も変えない。候補マッチ結果は意図的に含めていない——選定は毎回この場で回す",
+    "manifest": "data/asset_db/media_manifest.json",
+    "_manifest_note": "★原本の在庫表（クリップ名・実尺・窓数の集計のみ）。窓単位の解析データは配布物に含めない。候補は data/design/s34_FINAL3.json、追加の判断は実素材の実測と実画目視で行う。素材の既知の罠: 連番が商品をまたぐ（フォルダ名の商品帰属を信用しない）／rotationメタで実体が縦の素材が大半（probeのw/hで判定しない）／ラベルと実画は食い違うことがある（必ず実画で裏取り）"
+  },
+  "reference": {
+    "targets": ".fork/REFERENCE-TARGETS.json",
+    "_targets_note": "★『瓜二つか』は感想でなくこのファイルとの数値突合で判定する（G90 / scripts/reference_match.py）",
+    "prproj": "data/reference/0.7人前うどん.prproj",
+    "mp4": "data/reference/ref_うどん_0.7人前うどん.mp4",
+    "_readonly": "★参考prprojは読むだけ。絶対に編集しない。コピーも開かない（documentIDが複製されシーケンスが合流する）",
+    "structure_pct": {
+      "掴み": 13.5,
+      "展開": 41.6,
+      "見せ場": 33.1,
+      "締め": 11.8
+    },
+    "_structure_note": "参考599Fのショット境界から算出（81F/249F/198F/71F）",
+    "se_per_min": 3.0,
+    "_se_note": "参考のSEは冒頭0.00〜3.07秒のチリンのみ。以降19.97秒まで無い。★一律に置かない"
+  },
+  "thresholds": {
+    "_note": "★全て参考『0.7人前うどん』か本案件素材の実測から。他案件の値を流用しない",
+    "min_shot_sec": 0.467,
+    "_min_shot_reason": "参考の最短14F=0.467秒。これを下回ると画を認識する前に次へ行く（敵対レビュー指摘・採用）",
+    "max_shot_sec": 2.333,
+    "_max_shot_reason": "参考の最長70F。これを超える長回しは『画の強さ』の根拠を書く",
+    "shots_per_telop": 1.77,
+    "shots_per_telop_tol_pct": 30,
+    "_shots_per_telop_note": "★主判定はこれ。cuts_per_min ではない（テロップ密度を無視した過剰分割を防ぐ）",
+    "shot_len_median_frames": 24,
+    "shot_len_median_tol_pct": 30,
+    "telop_delta_rgb_min": 60,
+    "telop_delta_rgb_band": [
+      93.3,
+      141.8
+    ],
+    "_telop_delta_note": "背景平均色とのユークリッド距離。27.2で実際に読めなくなった",
+    "whiteclip_ratio_max": 0.02,
+    "_whiteclip_note": "★絶対値では判断できない。他ショットとの相対比較が主。0801では c04 6.34% / 他 0.00% で発覚",
+    "telop_width_ratio": 0.79,
+    "_telop_width_note": "参考下段の実測 856px/1080px。超えたら改行ではなくフォントを縮める（★8文字でも1行のまま）",
+    "zoom_start": 100,
+    "zoom_end_band": [
+      112,
+      117
+    ],
+    "_zoom_note": "冒頭のみパンチ 0F:100 / 4F:120 / 6F:110。★『縦横比を固定』を true にするとプロパティ名が変わる"
+  },
+  "ng_rules": [
+    "★追撮の提案禁止（不足はテロップ/ナレで補う・恒久）",
+    "★コンテの文言変更禁止（一字も）",
+    "★アプリクーポンは扱わない（恒久放置）",
+    "★字コンテの無い2商材（トロリスタ・ホイールグローブ）は着手しない",
+    "参考prprojの編集・.prprojのコピーを開くこと",
+    "完成MP4の直接編集・py/prproj/jsxの上書き・却下版の削除",
+    "検証目的だけの書き出しをユーザーに渡すこと"
+  ],
+  "_ng_not_applicable": {
+    "顔出し": "★この案件の素材は全て顔出しOK。顔が出ていてもNG分類しない・顔クロップ不要（ユーザー明示）"
+  },
+  "renderer": "premiere",
+  "telop_mode": "premiere",
+  "_telop_mode_note": "★MOGRT方式。PNG焼き込みは使わない。テンプレは skill/donki-feriest/assets/telop_3slot_v22.mogrt（v20は使わない）",
+  "premiere": {
+    "sequence": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30
+    },
+    "ticks_per_second": 254016000000,
+    "ticks_per_frame_30fps": 8467200000,
+    "editing_mode_guid": "795454d9-d3c2-429d-9474-923ab13b7018",
+    "fonts_required": [
+      "mplus-1p-heavy",
+      "HeiseiMinStd-W9",
+      "Makinas-4-Square"
+    ],
+    "_fonts_note": "★Adobe Fonts で3種を有効化してから着手する。未インストールの書体は Premiere が警告なしに別書体へ差し替える",
+    "bridge": "skill/donki-feriest/assets/MCPBridgeCEP",
+    "_bridge_note": "★毎セッション手動で Start Bridge。PlayerDebugMode=1 が要る。SETUP.md 参照",
+    "lumetri_saturation": 106
+  },
+  "qc": {
+    "gates": ".fork/gates.json",
+    "known_defects": ".fork/known_defects.json",
+    "lens_prompts": ".fork/lenses/",
+    "independent_rounds": 3,
+    "independent_lenses": 12,
+    "decision_rule": "2/3多数決。可否が割れたら却下側に倒す",
+    "_pass_conditions_override": ".fork/PROJECT-RULES.md §1（条件3・4を実施者名指しから性質へ一般化し、条件8 参考突合・条件9 較正ハーネス を追加）"
+  },
+  "notion": {
+    "_note": "★Notionが見られない環境では HANDBOOK.md と data/ledger/ で代替する。台帳の更新義務そのものは消えない",
+    "handbook_offline": "HANDBOOK.md",
+    "ledger_offline": "data/ledger/",
+    "handbook_url": "https://app.notion.com/p/3b88866ade56816b97ffce8c0024ac1d",
+    "revision_db_id": "41e8866a-de56-829f-850d-0726dd063cdc"
+  }
+}

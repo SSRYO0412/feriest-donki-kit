@@ -1,0 +1,35 @@
+{
+  "_note": "★採用が変わった瞬間に書く。過去の採用値と却下理由は消さずに history へ積む（PROJECT-RULES 恒久ルール9・10）。Notion に繋がったら転記するが、ここの行は消さない",
+  "_fields": {
+    "adopted_mp4": "現在の採用MP4（フルパス）",
+    "adopted_prproj": "現在の採用prproj",
+    "adopted_jsx": "その版を作った jsx（再生成できる粒度で）",
+    "version": "v7 のような版",
+    "updated": "YYYY-MM-DD",
+    "basis": "採用の根拠（全フレームSSIM / 32分割目視 / 尺 / クライアント承認 など）"
+  },
+  "videos": {
+    "0801": {
+      "product": "海老ドーン贅沢ぷりぷり海老マヨピザ",
+      "adopted_mp4": "@@FERIEST_ROOT@@/02_work/premiere/verify_20260809/v9.mov",
+      "adopted_prproj": "@@FERIEST_ROOT@@/02_work/premiere/FERIEST_0801_ebi_v1.prproj",
+      "adopted_jsx": "work/jsx_20260809/z08_c04c05.jsx",
+      "version": "v9",
+      "updated": "2026-08-11",
+      "basis": "G90 参考突合 13 PASS / 1 FAIL（G90-14 ズーム文法は未解決の実指摘として残置）",
+      "history": [
+        {
+          "version": "premierev2_6cut",
+          "prproj": "work/premiere/FERIEST_0801_ebi_v1__premierev2_6cut_20260809_1743.prproj",
+          "state": "却下",
+          "reason": "6カット版。★却下版として保持する。開かない（documentID 複製の事故を避ける）",
+          "date": "2026-08-09"
+        }
+      ]
+    },
+    "0802": {"product": "ド情熱逆さで使える消臭スプレー&速乾防水スプレー", "state": "未着手", "history": []},
+    "0803": {"product": "おうちでライブマイク", "state": "未着手", "history": []},
+    "0804": {"product": "Reebokファン付きベスト", "state": "未着手", "history": []},
+    "0805": {"product": "Mii +フレグランスオイル、ロックミルク", "state": "未着手", "history": []}
+  }
+}
