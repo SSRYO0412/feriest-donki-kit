@@ -35,6 +35,7 @@ user-invokable: true
 | `references/PREMIERE-RECIPE.md` | 0801の組み方（トラック構成・MOGRT・縦型SEQ生成・カットの共通設定・全パラメータ） |
 | `references/TRAPS.md` | Premiere API 13件・測定器の盲点6件・運用4件 |
 | `references/ASSETS.md` | 素材の引き方（在庫表・候補リスト・実測での裏取り）・素材の罠 |
+| `references/REVISION-PLAYBOOK.md` | ★修正指示の類型別手順（軸別代替候補表とカメラ分類の引き方） |
 | `references/MINIMAL-SET.md` | ★**別マシンで動かすのに要るもの一覧**・CEP拡張の導入手順 |
 | `assets/telop_3slot_v22.mogrt` | テロップの正本テンプレ（★v20は使わない） |
 | `assets/1f447.png` / `1f364.png` | 👇 と 🍤（Twemoji 72×72） |

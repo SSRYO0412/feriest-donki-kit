@@ -85,6 +85,7 @@ data/
   reference/             参考「0.7人前うどん」prproj + MP4 + ロゴ
   baseline/              0801の現行レンダー（修正の実演の出発点）
 design/build_0801.json   0801の構成（G90の入力）
+data/revision_aids/      ★修正即応表（軸別代替候補・188本×1秒プロファイル・事前計算済み）
 qc/                      検品の出力
 ```
 

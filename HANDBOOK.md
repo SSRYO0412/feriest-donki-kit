@@ -14,6 +14,7 @@
    - `PREMIERE-RECIPE.md` Premiereの組み方（コード付き）
    - `TRAPS.md` 踏んだ罠（API 18件・測定器の盲点7件・素材6件・選定5件・運用6件）
    - `ASSETS.md` 素材の引き方（在庫表・候補リスト・実測での裏取り）
+   - `REVISION-PLAYBOOK.md` 修正指示の類型別手順（★修正はまずここから）
    - `PROJECT-RULES.md` / `MINIMAL-SET.md`
 4. **`.fork/REFERENCE-TARGETS.json`** — 「瓜二つ」を判定する基準値（機械可読）
 5. **`.fork/known_defects.json`** — 較正ハーネスの既知欠陥9件
