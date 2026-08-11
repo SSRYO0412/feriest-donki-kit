@@ -1,0 +1,2 @@
+{"id": "L001", "situation": "窓DBのsubjectを書く/分割するとき", "judgment": "実フレームを見てから書く。subjectはtag_mapマッチの根拠になるので、記述漏れ（写り込む要素）は選定誤りに直結する（6232右後方に実はステッカー全域視認→絵の先出しを生んだ）", "source": "design", "quote": "", "date": "2026-07-29", "supersedes": null}
+{"id": "L002", "situation": "『絵変わり』目的で同系被写体の別区間を連続配置", "judgment": "絵変わりは被写体が変わって初めて成立。同系の絵の連続（荷室→荷室）は単調でむしろ逆効果。置かない（顔に戻す）方が締まる", "source": "design", "quote": "", "date": "2026-07-29", "supersedes": null}

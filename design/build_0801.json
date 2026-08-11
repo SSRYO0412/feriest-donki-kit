@@ -1,0 +1,274 @@
+{
+ "_note": "★G90 参考突合の入力。手で書き換えるときは出どころを必ず添える。ショット表は設計記録・書式はjsx実装・色は完成MP4 v9.mov の画素実測。設計と実物のズレは G90-11/12（設計カット点で画が変わるか）が捕まえる",
+ "_provenance": {
+  "shots": "設計記録（jsx w02_rebuild/z08_c04c05）。G90-11/12でMP4と突合",
+  "telop_style": "jsx w05_repair.jsx / u05_telop3.jsx / x03_place.jsx / z01_fix.jsx / z06_c01fit.jsx",
+  "telop_spans": "完成MP4 v9.mov のテロップ帯の画素差分から実測（0/28/86/162/227/282）",
+  "colors": "完成MP4 v9.mov の画素実測（c01 #E8E010≒#EFE919 / フチ #383030≒#3C3934 / c04下段 #E86848）"
+ },
+ "video_id": "0801",
+ "product": "海老ドーン贅沢ぷりぷり海老マヨピザ",
+ "fps": 30,
+ "frames": 337,
+ "width": 1080,
+ "height": 1920,
+ "mp4": "@@FERIEST_ROOT@@/02_work/premiere/verify_20260809/v9.mov",
+ "prproj": "@@FERIEST_ROOT@@/02_work/premiere/FERIEST_0801_ebi_v1.prproj",
+ "sequence": "0801_ebi",
+ "document_id": "3ea1839d-a639-48ba-acae-e0d506adfd39",
+ "shots": [
+  {
+   "name": "c01",
+   "start_f": 0,
+   "end_f": 28,
+   "src": "IMG_2855",
+   "tin": 3.7,
+   "zoom": [
+    100,
+    110
+   ],
+   "punch": false
+  },
+  {
+   "name": "c02a",
+   "start_f": 28,
+   "end_f": 57,
+   "src": "20260803_honma_a0929",
+   "tin": 3.033,
+   "zoom": [
+    100,
+    112
+   ],
+   "punch": false
+  },
+  {
+   "name": "c02b",
+   "start_f": 57,
+   "end_f": 86,
+   "src": "20260803_honma_a0925",
+   "tin": 47.667,
+   "zoom": [
+    100,
+    112
+   ],
+   "punch": false
+  },
+  {
+   "name": "c03a",
+   "start_f": 86,
+   "end_f": 111,
+   "src": "IMG_2852",
+   "tin": 17.1,
+   "zoom": [
+    100,
+    115
+   ],
+   "punch": false
+  },
+  {
+   "name": "c03b",
+   "start_f": 111,
+   "end_f": 136,
+   "src": "20260803_honma_a0931",
+   "tin": 3.333,
+   "zoom": [
+    100,
+    115
+   ],
+   "punch": false
+  },
+  {
+   "name": "c03c",
+   "start_f": 136,
+   "end_f": 162,
+   "src": "IMG_2857",
+   "tin": 17.567,
+   "zoom": [
+    100,
+    115
+   ],
+   "punch": false
+  },
+  {
+   "name": "c04",
+   "start_f": 162,
+   "end_f": 227,
+   "src": "20260803_honma_a0924",
+   "tin": 1.467,
+   "zoom": [
+    115,
+    135
+   ],
+   "punch": false,
+   "zoom_waiver": {
+    "reason": "ユーザー指示「もっとピザに寄って。」により参考帯(112-117)を超えて115→135にした。全ショット中で最大の寄り。参考の文法から意図して外した箇所",
+    "independent_approval": {
+     "reviewer": "human（ユーザー本人）",
+     "date": "2026-08-10",
+     "basis": "指示の原文そのもの。指示者=承認者なので独立レビューの代替にはならないが、『参考から外れている』事実は隠さずここに残す"
+    }
+   }
+  },
+  {
+   "name": "c05",
+   "start_f": 227,
+   "end_f": 282,
+   "src": "20260803_honma_a0928",
+   "tin": 3.667,
+   "zoom": [
+    100,
+    117
+   ],
+   "punch": false
+  },
+  {
+   "name": "c06a",
+   "start_f": 282,
+   "end_f": 309,
+   "src": "IMG_2848",
+   "tin": 2.333,
+   "zoom": [
+    100,
+    112
+   ],
+   "punch": false
+  },
+  {
+   "name": "c06b",
+   "start_f": 309,
+   "end_f": 337,
+   "src": "IMG_2856",
+   "tin": 7.467,
+   "zoom": [
+    100,
+    112
+   ],
+   "punch": false
+  }
+ ],
+ "telops": [
+  {
+   "text": "海老好き大集合　",
+   "start_f": 0,
+   "end_f": 28,
+   "font": "HeiseiMinStd-W9",
+   "size": 109.0,
+   "color": "#EFE919",
+   "tier": "感嘆・言い切り",
+   "vertical_pos": 47.5,
+   "stroke": "#3C3934",
+   "stroke_width": 11,
+   "note": "★『出現の型=なし』だと強調が発火しない。出現=1/0.15 + 強調の出方=1(後から跳ねる) 大きさ40。60だとピーク時に🍤へ53px食い込む（z06_c01fit）。末尾の全角スペースに🍤(1f364)を重ねる"
+  },
+  {
+   "text": "主役は海老",
+   "start_f": 28,
+   "end_f": 86,
+   "font": "mplus-1p-heavy",
+   "size": 68.948,
+   "color": "#FDFCFD",
+   "tier": "通常",
+   "vertical_pos": 47.5,
+   "stroke": "#3C3934",
+   "stroke_width": 11
+  },
+  {
+   "text": "ぷりぷり♡トロトロ♡",
+   "start_f": 86,
+   "end_f": 162,
+   "font": "HeiseiMinStd-W9",
+   "size": 109.0,
+   "color": "#FDFCFD",
+   "tier": "感嘆・言い切り",
+   "vertical_pos": 47.5,
+   "stroke": "#3C3934",
+   "stroke_width": 11
+  },
+  {
+   "text": "海老ドーン",
+   "start_f": 162,
+   "end_f": 227,
+   "font": "mplus-1p-heavy",
+   "size": 68.948,
+   "color": "#FDFCFD",
+   "tier": "商品名の2行組(上段)",
+   "vertical_pos": 43.65,
+   "stroke": "#3C3934",
+   "stroke_width": 11,
+   "note": "下段はV7/V8に別クリップ。上段68.948(高65)+18+下段141(高118)+18+下段141(高118)=337px、群中心941.5"
+  },
+  {
+   "text": "お盆はドンキのピザに決まり!",
+   "start_f": 227,
+   "end_f": 282,
+   "font": "mplus-1p-heavy",
+   "size": 68.948,
+   "color": "#FDFCFD",
+   "tier": "通常",
+   "vertical_pos": 47.5,
+   "stroke": "#3C3934",
+   "stroke_width": 11,
+   "note": "★赤入れR1で『トロリスタ』→『ドンキ』。文言は一字も変えない"
+  },
+  {
+   "text": "海老、海老、海老...",
+   "start_f": 282,
+   "end_f": 337,
+   "font": "mplus-1p-heavy",
+   "size": 68.948,
+   "color": "#FDFCFD",
+   "tier": "通常",
+   "vertical_pos": 47.5,
+   "stroke": "#3C3934",
+   "stroke_width": 11
+  }
+ ],
+ "telops_lower": [
+  {
+   "text": "贅沢ぷりぷり",
+   "start_f": 162,
+   "end_f": 227,
+   "font": "mplus-1p-heavy",
+   "size": 141.0,
+   "color": "#E86848",
+   "vertical_pos": 50.73,
+   "stroke": "#3C3934",
+   "stroke_width": 11,
+   "track": "V7/V8",
+   "_note": "c04区間のみ。上段テロップの枚数には数えない"
+  },
+  {
+   "text": "海老マヨピザ",
+   "start_f": 162,
+   "end_f": 227,
+   "font": "mplus-1p-heavy",
+   "size": 141.0,
+   "color": "#E86848",
+   "vertical_pos": 57.81,
+   "stroke": "#3C3934",
+   "stroke_width": 11,
+   "track": "V7/V8",
+   "_note": "c04区間のみ。上段テロップの枚数には数えない"
+  }
+ ],
+ "lockup": {
+  "logo": "月乗りドンペン.jpg",
+  "line1": "海老ドーン 贅沢ぷりぷり海老マヨピザ",
+  "line2": "※詳細は　をチェック！",
+  "font": "Makinas-4-Square",
+  "size": 35,
+  "emoji": "1f447.png"
+ },
+ "tracks": {
+  "V1": "カット10",
+  "V2": "ロゴ",
+  "V3": "テロップ上段6",
+  "V4": "ロックアップ1(3枚)",
+  "V5": "ロックアップ2(3枚)",
+  "V6": "👇",
+  "V7": "c04下段1",
+  "V8": "c04下段2",
+  "V9": "🍤(c01区間)"
+ },
+ "_track_note": "★V4/V5は各3枚に分割（MOGRTの素材長150Fを超えられないため 0-150/150-300/300-337）"
+}

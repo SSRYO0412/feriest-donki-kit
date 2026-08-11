@@ -1,0 +1,8 @@
+.DS_Store
+._*
+__pycache__/
+*.pyc
+qc/calibration/answers/
+
+# マシン固有のパス設定（.feriest-paths.example をコピーして作る）
+.feriest-paths

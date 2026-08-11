@@ -1,0 +1,42 @@
+{
+ "meta": {
+  "schema": "verified_clips ledger v1 — SELECTION_PROTOCOL.md §6。素材DB検索の前に必ずこの台帳を引く。追記専用(append-only)・上書き消去禁止",
+  "project": "<案件名をここに>",
+  "generated": "<YYYY-MM-DD>",
+  "source": "<この台帳の由来: どのバッチ/検証から集約したか>",
+  "verdict_levels": [
+   "GO",
+   "CONDITIONAL",
+   "WEAK",
+   "NO-GO",
+   "BANNED",
+   "USED-UNREVIEWED"
+  ],
+  "verdict_note": "GO=二重検証(自己+外部AI)両合格 / CONDITIONAL=条件付き(窓限定・クロップ必須等、notesに条件を明記) / WEAK=次点レベル(妥協採用の記録) / NO-GO=その窓では不合格(別窓は再検証可) / BANNED=ユーザー/クライアント指示による使用禁止(理由と日付を必ず記録) / USED-UNREVIEWED=使用実績はあるが検証記録なし(再使用時は要検証)",
+  "quality_signal_note": "goodcase=納品水準と判定された動画で使用 / oshii=惜しい判定の動画で使用。カット単体の良否ではなく文脈シグナル",
+  "hook_strength_note": "フック名→strong/weak。フックカット選定はstrong最優先。weakは『そのフックには使わない』の意味で他用途は妨げない。フック名は SELECTION_PROTOCOL.md §2 の主張タイプ分類に従う",
+  "window_note": "verdict は rel 単位でなく timestamp窓単位。過去のNO-GO記録があっても別窓は再検証してから除外する。過去のGOODも再使用時は自分の目で再確認する",
+  "new_batch_note": "新素材バッチ・別商品は clips 直下にセクションコメント用キー(例: '_section_<バッチ名>': {...meta...})を挟むか、relの名前空間で区別して追記。既存レコードは上書きしない"
+ },
+ "clips": {
+  "<素材の相対パス例: PRODUCT/folder/clip.mov>": {
+   "rel": "<素材の相対パス(上のキーと同一)>",
+   "windows": [
+    {
+     "tin": 0.0,
+     "t_range": "<有効窓 例: 1.0-3.0 (窓限定がある場合)>",
+     "used_in": ["<使用した動画ID_v番号>"],
+     "texts": ["<この窓に当てたテロップ/台本行>"],
+     "category": "<主張タイプ分類(質感・材質/機能・構造/動作反応/不在証明/社会的評価/ブランド・情緒/抽象概念)>",
+     "verdict": "GO",
+     "verified": "<YYYY-MM-DD 自己+外部AI両GO / 検証方法(複数フレーム目視・差分動画等)>",
+     "quality_signal": {"goodcase": [], "oshii": []},
+     "hook_strength": {"<フック名>": "strong"},
+     "face_risk": "<なし / 上部に顔リスク(crop必須) / t=X.Xで写り込み 等>",
+     "notes": "<実際に映っているもの・条件・注意(禁止帯・パンアウト時刻等)>"
+    }
+   ],
+   "verdict": "<クリップ全体の代表verdict(窓ごとに異なる場合は最も制限的な注意をnotesへ)>"
+  }
+ }
+}

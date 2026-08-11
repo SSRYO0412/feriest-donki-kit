@@ -1,0 +1,304 @@
+{
+ "gate": "G90",
+ "name": "参考突合（瓜二つ判定）",
+ "video_id": "0801",
+ "build": "/var/folders/xp/6g5pm9911fg_1_01wdqlvx0c0000gn/T/calib_4urhi_7f/build_D2.json",
+ "mp4": "@@FERIEST_ROOT@@/02_work/premiere/verify_20260809/v9.mov",
+ "reference": "0.7人前うどん",
+ "verdict": "FAIL",
+ "n_fail": 1,
+ "n_waived": 0,
+ "items": [
+  {
+   "id": "G90-1",
+   "name": "最短ショット",
+   "verdict": "PASS",
+   "measured": {
+    "under_floor": [],
+    "min": 25
+   },
+   "expected": {
+    ">=": 14
+   },
+   "note": "参考の最短が14F(0.467秒)。これを下回ると視聴者が画を認識する前に次へ行く（2026-08-09 Codex指摘・採用）"
+  },
+  {
+   "id": "G90-2",
+   "name": "最長ショット",
+   "verdict": "PASS",
+   "measured": {
+    "over_cap": [],
+    "max": 65
+   },
+   "expected": {
+    "<=": 70
+   },
+   "note": "超えるなら『画の強さ』の根拠を書く。0801では静止全景2.17秒が弱いと指摘された"
+  },
+  {
+   "id": "G90-3",
+   "name": "ショット尺の中央値",
+   "verdict": "PASS",
+   "measured": {
+    "median_frames": 28.0,
+    "median_sec": 0.933
+   },
+   "expected": {
+    "band_frames": [
+     16.8,
+     31.2
+    ],
+    "ref": 24
+   },
+   "note": ""
+  },
+  {
+   "id": "G90-4",
+   "name": "1テロップあたりのショット数（主判定）",
+   "verdict": "PASS",
+   "measured": {
+    "shots": 10,
+    "telops": 6,
+    "shots_per_telop": 1.667
+   },
+   "expected": {
+    "band": [
+     1.239,
+     2.301
+    ],
+    "ref": 1.77
+   },
+   "note": "★主判定は cuts_per_min ではなく shots_per_telop。参考は19.97秒で13テロップ。テロップ密度が違う動画にカット密度だけ合わせると画変わりだけが過剰になる（2026-08-09 Codex指摘・採用）"
+  },
+  {
+   "id": "G90-5",
+   "name": "cuts/分（参考値・単独では合否にしない）",
+   "verdict": "PASS",
+   "measured": {
+    "cuts_per_min": 53.4,
+    "duration_sec": 11.233
+   },
+   "expected": {
+    "ref": 69.1
+   },
+   "note": "★これだけを参考に合わせると過剰分割になる。主判定はG90-4"
+  },
+  {
+   "id": "G90-6",
+   "name": "テロップ様式が3階層のどれかに一致",
+   "verdict": "PASS",
+   "measured": {
+    "off_grammar": [],
+    "n": 6
+   },
+   "expected": {
+    "tiers": [
+     "通常",
+     "感嘆・言い切り",
+     "商品名の2行組"
+    ]
+   },
+   "note": "★参考のテロップは1種類ではない。13区間を全部並べて種別を分類してから様式を測る。1枚だけ見て決めない"
+  },
+  {
+   "id": "G90-7",
+   "name": "フチ色",
+   "verdict": "PASS",
+   "measured": {
+    "off": []
+   },
+   "expected": {
+    "stroke_color": "#3C3934"
+   },
+   "note": "★純黒ではない。暗いグレー"
+  },
+  {
+   "id": "G90-14",
+   "name": "ズーム文法",
+   "verdict": "FAIL",
+   "measured": {
+    "off_grammar": [
+     {
+      "shot": "c01",
+      "zoom": [
+       100,
+       110
+      ],
+      "_why": "理由と独立承認が揃っていない"
+     }
+    ],
+    "waived": [
+     {
+      "shot": "c04",
+      "zoom": [
+       115,
+       135
+      ],
+      "waiver": {
+       "reason": "ユーザー指示「もっとピザに寄って。」により参考帯(112-117)を超えて115→135にした。全ショット中で最大の寄り。参考の文法から意図して外した箇所",
+       "independent_approval": {
+        "reviewer": "human（ユーザー本人）",
+        "date": "2026-08-10",
+        "basis": "指示の原文そのもの。指示者=承認者なので独立レビューの代替にはならないが、『参考から外れている』事実は隠さずここに残す"
+       }
+      }
+     }
+    ]
+   },
+   "expected": {
+    "start": 100,
+    "end_range": [
+     112,
+     117
+    ]
+   },
+   "note": "★意図して外すのは可。ただし外した分だけ shots[].zoom_waiver に理由と独立承認を残す（0801のc04は『もっとピザに寄って。』の指示で115→135）"
+  },
+  {
+   "id": "G90-8",
+   "name": "尺（完成ファイル）",
+   "verdict": "PASS",
+   "measured": {
+    "mp4_frames": 337,
+    "wh": [
+     1080,
+     1920
+    ],
+    "fps": 30.0
+   },
+   "expected": {
+    "design_frames": 337,
+    "wh": [
+     1080,
+     1920
+    ]
+   },
+   "note": "★書き出しが途中で止まっても報告は成功に見える。実ファイルで数える"
+  },
+  {
+   "id": "G90-9",
+   "name": "白飛び（相対比較）",
+   "verdict": "PASS",
+   "measured": {
+    "per_shot": {
+     "c01": 0.00384,
+     "c02a": 0.0037,
+     "c02b": 0.0037,
+     "c03a": 0.0037,
+     "c03b": 0.0037,
+     "c03c": 0.0037,
+     "c04": 0.0037,
+     "c05": 0.0037,
+     "c06a": 0.0037,
+     "c06b": 0.0037
+    },
+    "median": 0.0037
+   },
+   "expected": {
+    "outliers": 0,
+    "abs_max": 0.02
+   },
+   "note": "★他のショットと比べて初めて異常と分かる。絶対値だけで判断しない"
+  },
+  {
+   "id": "G90-10",
+   "name": "黒フレーム",
+   "verdict": "PASS",
+   "measured": {
+    "frames": [],
+    "n": 0
+   },
+   "expected": {
+    "n": 0
+   },
+   "note": ""
+  },
+  {
+   "id": "G90-11",
+   "name": "設計カット点で画が変わる",
+   "verdict": "PASS",
+   "measured": {
+    "missing_cuts": [],
+    "threshold": 23.14,
+    "median_diff": 6.61
+   },
+   "expected": {
+    "missing": 0
+   },
+   "note": "設計上は切ったのに画が変わらない＝同一素材の連続や差し替え漏れ"
+  },
+  {
+   "id": "G90-12",
+   "name": "設計外の画変わりが無い",
+   "verdict": "PASS",
+   "measured": {
+    "unexpected_at": []
+   },
+   "expected": {
+    "n": 0
+   },
+   "note": "★素材内のシーン切替を踏んでいる可能性。窓の t0/t1 を実画で見直す"
+  },
+  {
+   "id": "G90-13",
+   "name": "テロップと背景の ΔRGB",
+   "verdict": "PASS",
+   "measured": {
+    "per_telop": [
+     {
+      "text": "海老好き大集合　",
+      "telop": "#EFE919",
+      "bg": "#EEC280",
+      "delta": 110.6,
+      "ok": true
+     },
+     {
+      "text": "主役は海老",
+      "telop": "#FDFCFD",
+      "bg": "#C6B895",
+      "delta": 135.2,
+      "ok": true
+     },
+     {
+      "text": "ぷりぷり♡トロトロ♡",
+      "telop": "#FDFCFD",
+      "bg": "#A89272",
+      "delta": 193.1,
+      "ok": true
+     },
+     {
+      "text": "海老ドーン",
+      "telop": "#D4B27D",
+      "bg": "#B36B46",
+      "delta": 94.8,
+      "ok": true
+     },
+     {
+      "text": "お盆はドンキのピザに決まり!",
+      "telop": "#FDFCFD",
+      "bg": "#BCB598",
+      "delta": 138.9,
+      "ok": true
+     },
+     {
+      "text": "海老、海老、海老...",
+      "telop": "#FDFCFD",
+      "bg": "#D8C4AB",
+      "delta": 105.4,
+      "ok": true
+     }
+    ]
+   },
+   "expected": {
+    ">=": 60,
+    "band": [
+     93.3,
+     141.8
+    ]
+   },
+   "note": "★下段の色は『食材を思わせる色 かつ 背景から浮く彩度』。背景の支配色をそのまま採ると埋もれる"
+  }
+ ],
+ "_waived_note": "★WAIVED は『測ったら外れていたが、理由と独立承認を添えて残した』の意味。PASS と混ぜて数えない。台帳にはこの件数をそのまま書く",
+ "_note": "★これは測定なのでモデル多様性の問題を受けない。判断が要るゲート（G50系・G91）とは別物として扱う"
+}

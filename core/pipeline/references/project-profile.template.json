@@ -1,0 +1,92 @@
+{
+ "_note": "案件プロファイル。案件ルートに project.json として複製して埋める。スパイン/型テンプレに数値を書かず、案件間で変わるものは全てここに書く。router 節は PROJECT-ROUTER.md の5問の回答（fork_project.py が対話で埋める）。",
+ "project": "<案件名>",
+ "video_id": "<動画ID>",
+ "type": "A",
+ "router": {
+  "_note": "PROJECT-ROUTER 5問の回答記録（2026-08-10）。time_skeleton: footage-first|script-first|reference-first。script-first は VO先行が鉄則・reference-first は構築前モーラ/秒検算ゲート必須",
+  "time_skeleton": "footage-first",
+  "strict_mode": false,
+  "strict_reason": "<Q3の事前リスク判定の根拠（transit比率等の実測）>",
+  "qc_profile": "FULL",
+  "ledger_style": "per-video-db"
+ },
+ "roles": {
+  "_note": "役割ベース抽象（配布対応・PROJECT-ROUTER）。環境に無い backend は次候補へフォールバック。どれも埋まらない役割を要求する工程は『実行不能』を宣言して止まる（黙って省かない）",
+  "viewer": ["agy", "gemini-api", "human"],
+  "adversary": ["codex-gpt-5.5", "claude-fork", "human"],
+  "scorer": ["scoring-subagent", "adversary"],
+  "machine": ["local-python-ffmpeg"]
+ },
+ "root": "<案件ルートの絶対パス>",
+ "nodes_file": "<ノードグラフJSON（型テンプレを複製・調整したもの）>",
+ "source": {
+  "aroll": "<主映像の絶対パス（型Bでは省略可）>",
+  "aroll_duration": 0.0,
+  "broll_dir": "<素材ディレクトリの絶対パス>",
+  "materials": {
+   "<素材名>": 0.0
+  },
+  "script": "<型D/Bのみ: 台本ファイルパス（1行=1台本行）>"
+ },
+ "thresholds": {
+  "_note": "★全て案件/参考の実測から。他案件の値を流用しない",
+  "silence_db": -42.0,
+  "silence_min_sec": 0.18,
+  "join_limit_sec": 0.25,
+  "min_shot_sec": 0.4,
+  "min_insert_sec": 1.5,
+  "insert_max_use": 2,
+  "insert_reappear_gap_sec": 15.0,
+  "telop_width_ratio": 0.74,
+  "telop_max_chars": 13,
+  "se_min_gap_sec": 1.35
+ },
+ "reference": {
+  "_note": "参考動画の実測（構造比率・SE文法など）。参考が変われば再測定",
+  "structure_pct": {
+   "掴み": 0,
+   "展開": 0,
+   "見せ場": 0,
+   "締め": 0
+  },
+  "se_per_min": 0.0
+ },
+ "ref_driven": {
+  "_note": "参照駆動選定（cut-craft REF-DRIVEN-SELECTION）を使う案件のみ・2026-07-30追加。align_approval ノードをノードグラフに足すこと",
+  "mode": "リズム移植|完全転写",
+  "ref_sheet_dir": "<参考1秒シート成果物dir>",
+  "style_profile": "<style_profile.jsonパス>",
+  "fidelity_contract": "qc/fidelity_contract.md"
+ },
+ "ng_rules": [
+  "<例: 第三者の顔>",
+  "<例: 別車両の値札>",
+  "<例: 追加撮影の提案禁止>"
+ ],
+ "renderer": "premiere",
+ "telop_mode": "premiere",
+ "_telop_mode_note": "premiere=[4]でtelops.json確定のみ・見た目は[8]でPremiereネイティブ一括投入→[8.5]検品（入りアニメ再現のため・2026-07-30）／burnin=従来PNG焼き込み（Remotion/ffmpeg納品）",
+ "proxy": {
+  "height": 480,
+  "fps": 15,
+  "crf": 30,
+  "audio_kbps": 64
+ },
+ "gemini_model": "gemini-3.6-flash-high",
+ "artifacts": {
+  "_note": "正本ファイルの現在位置（rootからの相対）。DAGノードのinputs/outputsが参照する",
+  "words": "work/words.json",
+  "env": "work/env.npy",
+  "cutlist": "work/cutlist.json",
+  "broll": "work/broll.json",
+  "telops": "work/telops.json",
+  "telop_manifest": "work/telop_manifest.json",
+  "se": "work/se.json",
+  "proxy_out": "work/proxy.mp4"
+ },
+ "notion": {
+  "sheet_db_id": "",
+  "revision_db_id": ""
+ }
+}

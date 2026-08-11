@@ -1,0 +1,222 @@
+{
+ "_note": "0802 DBなしビルド。設計=design_0802_v2.json(隔離レビュー17指摘の採否込み)",
+ "_provenance": {
+  "shots": "design v2(コンテ+s34候補+実画目視)",
+  "telop_spans": "design v2",
+  "colors": "様式は参考文法の宣言値。実測は本ファイルでのG90画素検証が初回"
+ },
+ "video_id": "0802",
+ "product": "ド情熱逆さで使える消臭スプレー&速乾防水スプレー",
+ "fps": 30,
+ "frames": 316,
+ "width": 1080,
+ "height": 1920,
+ "mp4": "/Volumes/Extreme SSD/FERIEST/02_work/premiere/verify_20260811/0802_v4.mov",
+ "prproj": "/Volumes/Extreme SSD/FERIEST/02_work/premiere/FERIEST_0802_spray_v1.prproj",
+ "sequence": "0802_spray",
+ "document_id": "020e440e-7df9-4dfc-b377-18a802392506",
+ "shots": [
+  {
+   "name": "c01",
+   "start_f": 0,
+   "end_f": 20,
+   "src": "IMG_8708",
+   "tin": 4.3,
+   "zoom": [
+    100,
+    120,
+    110
+   ],
+   "punch": true
+  },
+  {
+   "name": "c02",
+   "start_f": 20,
+   "end_f": 36,
+   "src": "IMG_8710",
+   "tin": 1.2,
+   "zoom": [
+    100,
+    112
+   ]
+  },
+  {
+   "name": "c03",
+   "start_f": 36,
+   "end_f": 56,
+   "src": "IMG_8703",
+   "tin": 9.5,
+   "zoom": [
+    100,
+    112
+   ]
+  },
+  {
+   "name": "c04",
+   "start_f": 56,
+   "end_f": 82,
+   "src": "20260803_honma_a0783",
+   "tin": 0.5,
+   "zoom": [
+    100,
+    115
+   ]
+  },
+  {
+   "name": "c05",
+   "start_f": 82,
+   "end_f": 108,
+   "src": "20260803_honma_a0782",
+   "tin": 12.9,
+   "zoom": [
+    100,
+    115
+   ]
+  },
+  {
+   "name": "c06",
+   "start_f": 108,
+   "end_f": 160,
+   "src": "20260803_honma_a0781",
+   "tin": 4.0,
+   "zoom": [
+    100,
+    115
+   ]
+  },
+  {
+   "name": "c07",
+   "start_f": 160,
+   "end_f": 174,
+   "src": "20260803_honma_a0785",
+   "tin": 3.6,
+   "zoom": [
+    100,
+    112
+   ]
+  },
+  {
+   "name": "c08",
+   "start_f": 174,
+   "end_f": 188,
+   "src": "20260803_honma_a0786",
+   "tin": 4.6,
+   "zoom": [
+    100,
+    112
+   ]
+  },
+  {
+   "name": "c09",
+   "start_f": 188,
+   "end_f": 202,
+   "src": "20260803_honma_a0787",
+   "tin": 14.2,
+   "zoom": [
+    100,
+    112
+   ]
+  },
+  {
+   "name": "c10",
+   "start_f": 202,
+   "end_f": 232,
+   "src": "20260803_honma_a0804",
+   "tin": 37.6,
+   "zoom": [
+    100,
+    112
+   ]
+  },
+  {
+   "name": "c12",
+   "start_f": 232,
+   "end_f": 274,
+   "src": "20260803_honma_a0802",
+   "tin": 1.5,
+   "zoom": [
+    100,
+    112
+   ]
+  },
+  {
+   "name": "c13",
+   "start_f": 274,
+   "end_f": 316,
+   "src": "20260803_honma_a0798",
+   "tin": 17.5,
+   "zoom": [
+    100,
+    112
+   ]
+  }
+ ],
+ "telops": [
+  {
+   "text": "その靴、そのまま履くのちょっと待って〜!!",
+   "start_f": 0,
+   "end_f": 56,
+   "tier": "通常",
+   "font": "mplus-1p-heavy",
+   "size": 68.948,
+   "color": "#FDFCFD",
+   "stroke": "#3C3934",
+   "stroke_width": 11
+  },
+  {
+   "text": "靴を持たずに逆さでそのままシューッ!",
+   "start_f": 56,
+   "end_f": 108,
+   "tier": "通常",
+   "font": "mplus-1p-heavy",
+   "size": 68.948,
+   "color": "#FDFCFD",
+   "stroke": "#3C3934",
+   "stroke_width": 11
+  },
+  {
+   "text": "届きにくい奥までしっかり消臭!",
+   "start_f": 108,
+   "end_f": 160,
+   "tier": "通常",
+   "font": "mplus-1p-heavy",
+   "size": 68.948,
+   "color": "#FDFCFD",
+   "stroke": "#3C3934",
+   "stroke_width": 11
+  },
+  {
+   "text": "雨が降りそうならこっちも忘れないで!",
+   "start_f": 160,
+   "end_f": 232,
+   "tier": "通常",
+   "font": "mplus-1p-heavy",
+   "size": 68.948,
+   "color": "#FDFCFD",
+   "stroke": "#3C3934",
+   "stroke_width": 11
+  },
+  {
+   "text": "速乾だから出発前でも余裕〜!",
+   "start_f": 232,
+   "end_f": 274,
+   "tier": "通常",
+   "font": "mplus-1p-heavy",
+   "size": 68.948,
+   "color": "#FDFCFD",
+   "stroke": "#3C3934",
+   "stroke_width": 11
+  },
+  {
+   "text": "これ知ったら戻れない😂",
+   "start_f": 274,
+   "end_f": 316,
+   "tier": "通常",
+   "font": "mplus-1p-heavy",
+   "size": 68.948,
+   "color": "#FDFCFD",
+   "stroke": "#3C3934",
+   "stroke_width": 11
+  }
+ ]
+}

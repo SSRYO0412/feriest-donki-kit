@@ -1,0 +1,96 @@
+{
+ "gate": "G92",
+ "mode": "mechanical",
+ "n": 4,
+ "detected": 4,
+ "rate": 1.0,
+ "pass_rule": "5件すべて検出（100%）。機械ゲートで拾えるはずのもの",
+ "verdict": "PASS",
+ "baseline_fail": [
+  "G90-14"
+ ],
+ "not_mechanical": {
+  "D3": "DBのラベルと実画の食い違い。実画を見ないと分からない → 目視レンズへ",
+  "D5": "検算スクリプト自身の誤り。動画ではなくコードの欠陥 → コードレビューのレンズへ",
+  "D6": "同種動作の連打がリテイク違いに見える → 意味と重複のレンズへ",
+  "D7": "離れた位置の画が機能として被る → 重複のレンズへ",
+  "D8": "訴求として弱い画 → 訴求のレンズへ"
+ },
+ "_note": "★機械で鳴らせるのはここまで。残りは packet モードで独立レビューに掛ける。『機械が全部通った＝良い』ではない（壊れていないことの証明にすぎない）",
+ "rows": [
+  {
+   "id": "D1",
+   "title": "白飛び",
+   "expected_gate": "G90-9",
+   "fired": true,
+   "all_fired": [
+    "G90-11",
+    "G90-13",
+    "G90-9"
+   ],
+   "detector": "qc_machine.py / 全ショットの白飛び率を相対比較",
+   "lesson": "★白飛びは絶対値では判断できない。他のショットと比べて初めて異常と分かる"
+  },
+  {
+   "id": "D4",
+   "title": "最短ショットが知覚の下限を割る",
+   "expected_gate": "G90-1",
+   "fired": true,
+   "all_fired": [
+    "G90-1",
+    "G90-11"
+   ],
+   "detector": "reference_match.py / shot_len_min_frames_floor",
+   "lesson": "★参考の最短が知覚の下限。数値で持つ"
+  },
+  {
+   "id": "D9",
+   "title": "数値だけを参考に合わせた過剰分割",
+   "expected_gate": "G90-4",
+   "fired": true,
+   "all_fired": [
+    "G90-1",
+    "G90-11",
+    "G90-3",
+    "G90-4"
+   ],
+   "detector": "G50-4 テンポ整合",
+   "lesson": "★主判定は cuts/分ではなく 1テロップあたりのショット数（参考1.77）"
+  },
+  {
+   "id": "D2",
+   "title": "テロップ色が背景に埋もれる",
+   "expected_gate": "reference_match.py / telop_contrast",
+   "fired": true,
+   "kind": "rule_unit_test",
+   "cases": [
+    {
+     "telop": "#D4B27D",
+     "bg": "#C6A26B",
+     "delta": 27.9,
+     "expected": "FAIL",
+     "got": "FAIL",
+     "why": "実際に読めなくなった組み合わせ"
+    },
+    {
+     "telop": "#EAB1A3",
+     "bg": "#989083",
+     "delta": 94.0,
+     "expected": "PASS",
+     "got": "PASS",
+     "why": "参考の実測（帯の下限側）"
+    },
+    {
+     "telop": "#EFE919",
+     "bg": "#C1B795",
+     "delta": 141.4,
+     "expected": "PASS",
+     "got": "PASS",
+     "why": "参考の実測（帯の上限側）"
+    }
+   ],
+   "detector": "reference_match.py / telop_contrast",
+   "lesson": "★『素材の色』ではなく『食材を思わせる色 かつ 背景から浮く彩度』"
+  }
+ ]
+}
