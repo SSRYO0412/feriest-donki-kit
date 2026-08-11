@@ -13,7 +13,7 @@
 | **MOGRT `telop_3slot_v22.mogrt`** | ✅ このスキルの `assets/` に**同梱済み** |
 | **Twemoji `1f447.png` / `1f364.png`** | ✅ 同梱済み |
 | **CEP Bridge 拡張**（100KB・5ファイル） | ✅ `assets/MCPBridgeCEP/` に**同梱済み** |
-| **`pr.sh`**（jsx投入スクリプト） | ✅ `scripts/pr.sh` に**同梱済み** |
+| **`pr.sh`**（jsx投入スクリプト） | ✅ `skill/donki-feriest/scripts/pr.sh` に**同梱済み**（★正本）|
 | **判断の正本 15ファイル**（下記） | ✅ **このキットに同梱済み**（`core/` と `skills/` に全15本。実在を検算済み 2026-08-11）|
 | **フォント3種** | ❌ Adobe Fonts で有効化（マシン側） |
 
