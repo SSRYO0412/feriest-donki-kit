@@ -440,6 +440,7 @@ PY
 |---|---|
 | `video_id` / `product` / `fps` / `frames` / `width` / `height` | 基本 |
 | `shots[]` | `name` / `start_f` / `end_f` / `src` / `tin` / `zoom` / `punch` |
+| `telops[].lines` | ★**行割り。2要素なら MOGRT 2枚重ね**（V3+V7・1枚に全文を入れると幅がはみ出す。PREMIERE-RECIPE 参照）|
 | `telops[]` | 本文・様式（3階層のどれか）・区間 |
 | `_provenance` | ★**どの数値がどこから来たか**。0801 は「ショット表=設計記録の jsx」「色=完成MP4の画素実測」と書いてあります |
 

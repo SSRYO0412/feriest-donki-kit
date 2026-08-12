@@ -161,7 +161,11 @@
    "size": 68.948,
    "color": "#FDFCFD",
    "stroke": "#3C3934",
-   "stroke_width": 11
+   "stroke_width": 11,
+   "lines": [
+    "その靴、そのまま履くの",
+    "ちょっと待って〜!!"
+   ]
   },
   {
    "text": "靴を持たずに逆さでそのままシューッ!",
@@ -172,7 +176,11 @@
    "size": 68.948,
    "color": "#FDFCFD",
    "stroke": "#3C3934",
-   "stroke_width": 11
+   "stroke_width": 11,
+   "lines": [
+    "靴を持たずに逆さで",
+    "そのままシューッ!"
+   ]
   },
   {
    "text": "届きにくい奥までしっかり消臭!",
@@ -183,7 +191,11 @@
    "size": 68.948,
    "color": "#FDFCFD",
    "stroke": "#3C3934",
-   "stroke_width": 11
+   "stroke_width": 11,
+   "lines": [
+    "届きにくい奥まで",
+    "しっかり消臭!"
+   ]
   },
   {
    "text": "雨が降りそうならこっちも忘れないで!",
@@ -194,7 +206,11 @@
    "size": 68.948,
    "color": "#FDFCFD",
    "stroke": "#3C3934",
-   "stroke_width": 11
+   "stroke_width": 11,
+   "lines": [
+    "雨が降りそうなら",
+    "こっちも忘れないで!"
+   ]
   },
   {
    "text": "速乾だから出発前でも余裕〜!",
@@ -205,7 +221,11 @@
    "size": 68.948,
    "color": "#FDFCFD",
    "stroke": "#3C3934",
-   "stroke_width": 11
+   "stroke_width": 11,
+   "lines": [
+    "速乾だから",
+    "出発前でも余裕〜!"
+   ]
   },
   {
    "text": "これ知ったら戻れない😂",
@@ -216,7 +236,11 @@
    "size": 68.948,
    "color": "#FDFCFD",
    "stroke": "#3C3934",
-   "stroke_width": 11
+   "stroke_width": 11,
+   "lines": [
+    "これ知ったら戻れない　"
+   ]
   }
- ]
+ ],
+ "_lines_note": "★lines が2要素のテロップは【MOGRT 2枚重ね】で実装する（1枚に全文を入れると幅がはみ出す）。上段=V3 縦位置46.0 / 下段=V7 縦位置52.9。実装例: work/jsx_20260811_0802/b04_telops.jsx"
 }
