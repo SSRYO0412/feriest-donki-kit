@@ -308,6 +308,56 @@ def check_pixels(build, T, mp4, r, band_px=None):
           T["telop_contrast"]["_note"])
 
 
+def check_telop_width(build, T, mp4, info, r):
+    """G90-15 テロップ幅の画素検査 — 文字が画面両端にはみ出していないかを完成画素で見る。
+
+    ★2026-08-11 追加。配布先マシンで「2行にすべきテロップが1行で幅はみ出し」が起きた。
+      幅の崩れはそれまで目視ゲート（G22/G52-1）頼みで、機械が止めてくれなかった。
+      フォント置換など環境差でも崩れるので、環境側で機械的に止まる網が要る。
+
+    判定: テロップ帯の各列について「宣言文字色に近い画素」と「フチ色に近い画素」が
+    同じ列に共存する列を『文字列』とみなし、文字列が左右端 16px 以内に達していたら FAIL。
+    （白壁は文字色に合うがフチが無い／暗部はフチ色に合うが文字色が無い → 誤検出しない）
+    """
+    fps = info["fps"]
+    y0, y1 = 800, 1120                      # テロップ群の帯（2〜3行構成まで覆う）
+    SW, SH = 540, 110                       # 列=2px 粒度
+    sc = hex2rgb(T["telop_grammar"]["stroke_color"])
+    rows = []
+    for t in build["telops"]:
+        if not t.get("color"):
+            continue
+        a, b = t["start_f"], t["end_f"]
+        mid = (a + b) // 2
+        px = rgb_region(mp4, mid, fps, 0, y0, info["w"], y1 - y0, SW, SH)
+        tc = hex2rgb(t["color"])
+        text_cols = []
+        for x in range(SW):
+            n_col = n_st = 0
+            for y in range(SH):
+                p = px[y * SW + x]
+                if dist(p, tc) < 60:
+                    n_col += 1
+                if dist(p, sc) < 45:
+                    n_st += 1
+            if n_col >= 2 and n_st >= 2:
+                text_cols.append(x)
+        if not text_cols:
+            rows.append({"text": t.get("text"), "cols": 0, "ok": True,
+                         "_note": "文字列を検出できず（テロップ無し帯なら正常）"})
+            continue
+        left_px = text_cols[0] * info["w"] / SW
+        right_px = (text_cols[-1] + 1) * info["w"] / SW
+        ok = left_px >= 16 and right_px <= info["w"] - 16
+        rows.append({"text": t.get("text"), "left_px": round(left_px),
+                     "right_px": round(right_px),
+                     "width_px": round(right_px - left_px), "ok": ok})
+    r.add("G90-15", "テロップ幅（両端はみ出し）", all(x["ok"] for x in rows),
+          {"per_telop": rows}, {"margin_px": 16},
+          "★lines が2要素のテロップは MOGRT 2枚重ねで実装する（1枚に全文だと幅がはみ出す）。"
+          "PREMIERE-RECIPE『2行テロップの組み方』参照")
+
+
 def check_zoom(build, T, r):
     z = T["zoom_grammar"]
     lo, hi = z["others"]["end_range"]
@@ -350,6 +400,7 @@ def main():
     check_zoom(build, T, r)
     if a.mp4:
         check_pixels(build, T, a.mp4, r, a.telop_band)
+        check_telop_width(build, T, a.mp4, probe_frames(a.mp4), r)
     else:
         r.add("G90-P", "画素実測", False, {"mp4": None}, {"mp4": "required"},
               "★--mp4 を渡さない実行は G90 の合格にならない。設計値だけの検算は"
