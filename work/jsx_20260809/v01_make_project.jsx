@@ -1,3 +1,9 @@
+// ★★★2026-08-13 追記: このスクリプトの proj.createNewSequence は
+//   【新規シーケンスダイアログが開き、人が OK を押すまで返らない】（引数を何にしても出る）。
+//   無人で回すと必ずタイムアウトする。★新版 v01b_make_project.jsx を使うこと
+//   （createNewSequenceFromClips でダイアログ無しに作る）。
+//   このファイルは記録として残してある（上書き禁止）。
+
 var L = [];
 function log(s){ L.push(String(s)); }
 function flush(p){ var f=new File(p); f.encoding="UTF-8"; f.lineFeed="Unix"; f.open("w"); f.write(L.join("\n")); f.close(); }

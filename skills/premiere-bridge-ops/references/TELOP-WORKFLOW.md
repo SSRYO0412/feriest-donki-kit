@@ -125,21 +125,33 @@ python3 scripts/mogrt_enable_font_edit.py 出力.mogrt 出力_fontedit.mogrt
 
 ### 3-1. シーケンスを用意する
 
+★★★**`proj.createNewSequence` を使ってはいけない。** 引数に関係なく
+「新規シーケンス」ダイアログが開き、**人が OK を押すまでスクリプトが返らない**
+（2026-08-13 実測。無人で回すと必ずタイムアウトする）。
+
+**無人で作るなら次の2つ**（どちらも実測でダイアログ無し）:
+
 ```javascript
-proj.createNewSequence("名前", "任意のID");   // ★既定プリセット = 1920x1080 / 23.976fps
-proj.openSequence(seq.sequenceID);             // プロジェクトとシーケンスを同時にアクティブ化
+// ① 既にシーケンスがあるなら複製（30〜250ms・フォーカスを奪わない）
+src.clone();
+var made = null;                                   // ★複製物は「<元名> のコピー」
+for (var i = 0; i < proj.sequences.numSequences; i++)
+    if (proj.sequences[i].name === src.name + " のコピー") made = proj.sequences[i];
+made.name = "新しい名前";
+// 複製は中身が残るので空にする
+for (var v = 0; v < made.videoTracks.numTracks; v++) {
+    var V = made.videoTracks[v];
+    for (var c = V.clips.numItems - 1; c >= 0; c--) V.clips[c].remove(false, false);
+}
+
+// ② プロジェクトが空なら素材から作る（87ms・フォーカスは奪う）
+proj.createNewSequenceFromClips("名前", [item], proj.rootItem);
 ```
 
-★★★**第2引数を空文字列 `""` にしてはいけない。**「新規シーケンス」ダイアログが開き、
-**人が OK を押すまでスクリプトが返らない**（2026-08-13 実測。無人で回すと必ずタイムアウトする）。
-ここに「任意のID」と書いてあるのが正しい。中身は見ていないので何でもよい。
-
-★**縦型（1080x1920）はスクリプトで作れる**（2026-08-09 解消・2026-08-13 に無人化まで確認）。
-プリセットのパスを渡しても**内容は反映されない**（何を渡しても 1920x1080/23.976）ので、
-**作ってから `setSettings` で上書きする**のが唯一の道。
+★**縦型（1080x1920）は `setSettings` で決める。** 複製元が横型でも縦型に変えられる（実測）。
 
 ```javascript
-proj.createNewSequence(name, "vops");         // ★空文字列にしない
+// made = 上で作ったシーケンス
 var st = seq.getSettings();
 st.videoFrameWidth = 1080; st.videoFrameHeight = 1920;
 var tk = new Time(); tk.ticks = "8467200000"; st.videoFrameRate = tk;   // 30fps

@@ -43,8 +43,9 @@ function focusAway() {
 | シーケンス | `seq.name =` | 通る |
 | シーケンス | `getSettings()` | 1280x720 |
 | シーケンス | `exportAsFinalCutProXML(path)` | true |
-| シーケンス | `proj.createNewSequence(name, "")`（**空**） | **★ダイアログが開いて止まる**（下記・2026-08-13 訂正） |
-| シーケンス | `proj.createNewSequence(name, "vops")`（**空でない文字列**） | 通る・**奪わない**・ダイアログ無し |
+| シーケンス | `proj.createNewSequence(name, ...)` | **★引数に関係なくダイアログが開いて止まる**（§H・2026-08-13 再訂正） |
+| シーケンス | **`sequence.clone()`** | **ダイアログ無しで通る（30〜250ms）**。複製元が要る |
+| シーケンス | **`createNewSequenceFromClips`** | **ダイアログ無し（87ms）**。ただしフォーカスは奪う |
 | トラック | `track.setMute(1/0)` / `isMuted()` | 通る |
 | 素材 | `item.setScaleToFrameSize()` | 通る |
 | 素材 | `item.setInPoint` / `setOutPoint` / `getInPoint` / `getOutPoint` | 1.00-3.00 ／ **★2引数必須**（下記） |
@@ -326,45 +327,62 @@ UXP 26.x にも `TextLayer` / `setText()` は**存在しない**（公式型定�
   正解値を知らないので断定できない（UIに「10 px・外側」の表示があったので
   フチ幅10pxの可能性はある）
 
-## H. シーケンス作成は第2引数でダイアログの有無が決まる（2026-08-13 実測・★過去の記述を訂正）
+## H. シーケンス作成にはダイアログが出る（2026-08-13 実測・★過去2回の記述を訂正）
 
-**`proj.createNewSequence(name, "")` は「新規シーケンス」ダイアログを開いてそこで止まる。**
-この文書は以前「通る・奪わない」と書いていたが、**人が OK を押していたから通っていた**だけだった
-（実際にユーザーが毎回押していた。スクリプトが人の操作に依存していた）。
+**`proj.createNewSequence(name, ...)` は「新規シーケンス」ダイアログを開いて、
+人が OK を押すまで返らない。第2引数を何にしても出る。**
 
-止まっている証拠は**到達ログ**で採れる。1ステップごとにファイルへ追記する probe を流すと、
-`createNewSequence` の直前で途切れ、`ExtendScript execution timed out after 60000ms` になる。
+この文書は過去に2回間違えている。
+1回目「通る・奪わない」→ 2回目「第2引数を空でない文字列にすれば出ない」→ **どちらも誤り**。
+**どちらも、測定中に人が横で OK を押していたから「通った」ように見えていた。**
 
-| 第2引数 | 結果 |
-|---|---|
-| `""`（空文字列） | **★ダイアログが開いて停止**（人が押すまで返らない） |
-| 実在するプリセットのパス | 戻る・ダイアログ無し |
-| **存在しない**プリセットのパス | 戻る・ダイアログ無し |
-| `"x"` / `" "`（空白1文字） | **戻る・ダイアログ無し** |
+### 測り方（これ以外では判定できない）
 
-**第2引数は「ダイアログを出すか出さないか」のスイッチでしかなく、中身は見ていない。**
-実在チェックすらしていない。
+**「スクリプトが戻ったか」では判定できない。** 人がいると通ってしまう。
+**誰も画面を触らない状態で短いタイムアウトを掛け、止まるかどうかで見る。**
 
-### ★プリセットの内容は反映されない
+実測: 到達ログを1行ずつ書きながら呼ぶと `createNewSequence` の直前で途切れ、15秒でタイムアウト。
+画面には「新規シーケンス」ダイアログ（プリセット一覧・シーケンス名・OK/キャンセル）が出ていた。
+人がいるときは 9360ms で戻った＝その間に押されていた。
 
-縦型の `Social Media Portrait 9x16 30 fps` を渡しても、HD プリセットを渡しても、
-存在しないパスを渡しても、**すべて 1920x1080 / 23.976fps（ticks=10594584000）**で出来た。
-**狙った仕様にするには `setSettings` で上書きするしかない。**
+### ★ダイアログを出さずに作る2つの手段（実測・無人で完走）
+
+| 手段 | 所要 | 条件 |
+|---|---|---|
+| **`sequence.clone()`** | **30〜250ms** | 複製元のシーケンスが1本要る |
+| **`proj.createNewSequenceFromClips(name, [item], bin)`** | **87ms** | 素材（projectItem）が1つ要る |
+
+**どちらも複製直後に `setSettings` で仕様を自由に変えられる**
+（横型 1920x1080 の複製元から縦型 1080x1920 へ変更できることを実測）。
 
 ```javascript
-proj.createNewSequence(name, "vops");        // ★空文字列にしない（中身は何でもよい）
-var st = seq.getSettings();
+// ① 既にシーケンスがあるなら複製が最短
+src.clone();
+var made = null;                                   // ★複製物の名前は「<元名> のコピー」
+for (var i = 0; i < proj.sequences.numSequences; i++)
+    if (proj.sequences[i].name === src.name + " のコピー") made = proj.sequences[i];
+made.name = "新しい名前";
+
+// ② プロジェクトが空なら素材から作る
+proj.createNewSequenceFromClips("名前", [item], proj.rootItem);
+
+// ③ 仕様は setSettings で決める（複製元と違う仕様にできる）
+var st = made.getSettings();
 st.videoFrameWidth = 1080; st.videoFrameHeight = 1920;
 var tk = new Time(); tk.ticks = "8467200000"; st.videoFrameRate = tk;   // 30fps
 st.videoPixelAspectRatio = "1:1";
 st.editingMode = "795454d9-d3c2-429d-9474-923ab13b7018";
 st.videoFieldType = 0;
-seq.setSettings(st);                          // ここで初めて狙いの仕様になる
-// 実測: 1080x1920 / ticks=8467200000 / V=3 A=4
+made.setSettings(st);
+
+// ④ 複製は中身が残るので空にする
+for (var v = 0; v < made.videoTracks.numTracks; v++) {
+    var V = made.videoTracks[v];
+    for (var c = V.clips.numItems - 1; c >= 0; c--) V.clips[c].remove(false, false);
+}
 ```
 
-**教訓**: 「通った」の記録は、**人が横で押していないか**を疑う。無人で回す前提の運用では、
-ダイアログで止まる操作は「動く」ではなく「止まる」。到達ログを仕込めば機械で判別できる。
+★`createNewSequenceFromClips` は**フォーカスを奪う**（C群）。セットアップ段でまとめる。
 
 ## G. 素材のイン点/アウト点（トリム投入）— 2026-08-13 全数実測
 

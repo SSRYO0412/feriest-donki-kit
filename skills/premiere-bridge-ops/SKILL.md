@@ -574,7 +574,7 @@ Premiere 26.3.2 で全数実測した（各操作の直前にフォーカスを�
 
 読み取り全般 / `overwriteClip` / `insertClip` / `clip.start=` / `clip.end=` /
 `clip.disabled=` / `clip.name=` / `remove()` / マーカー一式 / `setInPoint` / `setOutPoint` /
-`seq.name=` / `getSettings` / `exportAsFinalCutProXML` / `createNewSequence`（**第2引数は空にしない**・§3-1） /
+`seq.name=` / `getSettings` / `exportAsFinalCutProXML` / **`sequence.clone()`**（★`createNewSequence` はダイアログで止まる・§3-1） /
 `track.setMute` / 素材の `setScaleToFrameSize`・`setInPoint`・`setOutPoint`・`getMarkers` /
 **キーフレーム一式**（`getValue`/`setValue`/`setTimeVarying`/`addKey`/`setValueAtKey`/`getValueAtKey`）/
 ネスト（`seq.projectItem` を置く）/ 選択（`setSelected`/`getSelection`）/
@@ -588,8 +588,9 @@ Premiere 26.3.2 で全数実測した（各操作の直前にフォーカスを�
 `importFiles` / `createBin` / `createSubClip` / `createNewSequenceFromClips` /
 `createSubsequence` / `clone` / `deleteSequence`
 
-**「新しく作る」系が奪う**と覚えると外さない。例外: `createNewSequence` は奪わない。
-★ただし**第2引数を空文字列にするとダイアログが開いて止まる**（2026-08-13 訂正・§3-1）。
+**「新しく作る」系が奪う**と覚えると外さない。
+★**`createNewSequence` は引数に関係なくダイアログが開いて止まる**（2026-08-13 再訂正）。
+  無人で作るなら **`sequence.clone()`**（奪わない）か `createNewSequenceFromClips`（奪う）。
 
 **C. 対象をアクティブにしないとできない（QE依存）**
 
