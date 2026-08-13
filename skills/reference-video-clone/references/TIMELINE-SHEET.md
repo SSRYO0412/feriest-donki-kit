@@ -3,9 +3,10 @@
 > reference-video-clone の分析出力を「集計値」から「時系列の正本」へ強化する正典。
 > 背景の実害: 集計（cuts/min・中央値・±30%照合）は分布の形と順序を捨てるため、
 > 「見せ場前の3〜4秒スローパン」等の**編集の癖**が分析からも検品からも消えていた。
-> ショート動画特化。シートの置き場所は **Notion**（テンプレDBを案件ごとに複製）。
-> テンプレDB: https://app.notion.com/p/641937c3ad6245a38742dc7548aea9e7
-> （data_source_id: 22cfa926-0f9b-4419-98a9-c89fd6f769ab・31列）
+> ショート動画特化。★**シートの置き場所は VOPS Ledger の `ref_sheet_db`**（2026-08-12 に Notion から移管。
+> Notion 側には機能を残さない）。案件ごとにDBを複製する作業は無くなった — db_key は固定で、
+> **参考動画ごとに `video_id` 列で分かれる**（`scope: per-video`）。
+> 触り方は MCP（`ledger_query` / `ledger_upsert` / `schema_list`）。規範は `ledger-db-contract.md` §0。
 
 ## 原則
 
@@ -42,11 +43,16 @@
   例:「見せ場直前に3〜4秒スローパン→数字を読み終わる瞬間にSNAPカット。パン中はテロップ更新を止める」
 ```
 
-## シートの列（Notionテンプレ「参考動画1秒分析シート」と対応）
+## シートの列（台帳 `ref_sheet_db` の列と対応）
+
+★**`video_id` には参考動画の識別子**（`ref_<slug>`。例 `ref_movie_2603_37`）を入れる。
+これは契約§1のキー文法の**唯一の例外**で、監査の対象外（参考動画は納品物ではないため）。
+★**スクショは画像添付ではなく `スクショパス`（path型）**。台帳に画像は置けない（v1は画像なし）ので、
+代表フレームのフルパスを入れて、絵はローカルのファイルで見る（Claude は Read で直接読める）。
 
 | 群 | 列 |
 |---|---|
-| 時間 | 秒(title)・開始秒(number・ソート用)・スクショ(files: 代表+イベントフレーム) |
+| 時間 | 秒(title・`s018` のゼロ埋め)・開始秒(number・ソート用)・スクショパス(path: 代表フレーム) |
 | カット | cut_id・カット内経過/カット総尺・カット点イベント(サブ秒) |
 | 映像 | 映っているもの(inventory要約)・shot_size・フレーミング変化(何から何へ) |
 | カメラ | camera_work(種類+速度)・カメラ経過(開始から/残り)・パンチイン/ズーム(倍率・イージング) |
@@ -59,7 +65,7 @@
 ## 生成パイプライン（インジェストv3レーンの転用）
 
 ```
-[R0] ★参考の「完成度」を先に確かめる（2026-08-09 Feriest で追加）:
+[R0] ★参考の「完成度」を先に確かめる（2026-08-09 案件F で追加）:
      参考が本当に完成品か（末尾が未処理・テロップ未整備・現場音のままの区間が無いか）を
      通しで確認してから測る。未処理区間が混ざると cuts/分・被覆率などの統計が全部汚染される
      （実例: RICLOW は12.06秒以降が未処理で、カット毎分26.4が実態より低く出ていた）。
@@ -71,7 +77,8 @@
      agy: 等速+0.25倍速の連続描写・意図仮説・肝候補5つ
      Codex: 4枚/秒の全軸精読 + 遷移±0.5秒の30fps全コマ（アニメ実測）+ 肝候補5つ（敵対）
 [R3] 突合: prproj/機械の時刻へAI所見をスナップ・conflict列・確定/推定ラベル
-[R4] 人: 意図列・肝TOP3・判断文法昇格 → Notionシートへ投入（1秒=1行+スクショ）
+[R4] 人: 意図列・肝TOP3・判断文法昇格 → 台帳 `ref_sheet_db` へ投入（1秒=1行+スクショパス）
+     `python3 scripts/ref_sheet_push.py <sheet_rows.json> <project_id> <ref_id>`
 [R5] 癖プロファイル自動集計: パン/ズーム尺の分布・絵変わり間隔の系列・1秒ビンpacing curve・
      テロップ×SE同期率・フック構造(0-3秒) → cut-craft の需要側正本（style profile）へ接続（選定側の使い方は short-video-cut-craft/references/REF-DRIVEN-SELECTION.md=3軸評価・S0〜S8）。
      ★style_profile/telop_ledger は [4]アセンブリの様式入力（SE選曲文法・テロップ造形/アニメ仕様）と
@@ -102,10 +109,10 @@ SE種類=agyが聴いて同定（推定）／SE音量=RMS差分（推定）／BG
 - `ref_prproj_dump.py`（Premiere MCP/ExtendScript経由の全数ダンプ）
 - `ref_machine.py`（ingest_w0拡張: フロー数値化・オンセット・テロップ遷移）
 - agy_lane.py / codex_lane.py はインジェスト版を参考分析プロンプトで再利用
-- `ref_sheet_build.py`（突合→1秒行合成→Notion投入・スクショはFile Upload API直叩き）
+- `ref_sheet_build.py`（突合→1秒行合成）→ `ref_sheet_push.py`（台帳 `ref_sheet_db` へ投入・冪等）
 - `ref_style_profile.py`（癖プロファイル集計→cut-craftのpacing_curve/style_profileへ）
 
-## [R3.5] 完全再現レベルへの昇格手順（07具志さん2で確立・2026-07-30）※旧記載[R6]はパイプラインのverifyと重複のため改番
+## [R3.5] 完全再現レベルへの昇格手順（07参考G2で確立・2026-07-30）※旧記載[R6]はパイプラインのverifyと重複のため改番
 シートを「同じ素材で1:1再現できる」レベルにするには、[R3]の後・[R4]の前後で以下を必ず行う。Codex敵対検証で「概ね十分」判定を得た実証手順:
 1. **フォントは prproj から直接抜く（目視照合だけで確定しない）**: `scripts/extract_prproj_fonts.py <prproj> <telop_fullread.json>`。prproj(gzip XML)のソーステキストblobからPostScript名を抽出し、本文突合で動画単位に絞る。※実証: 目視照合の初期候補（源真ゴシック/凸版文久明朝）は両方誤りで、正解はNotoSansCJKjp-Black/SourceHanSerif-Heavyだった。目視のみのフォント特定は禁止（telop-analysis-methodology 12節に恒久化済み）
 2. **テロップpx実測**: `scripts/measure_telop_px.py <telop_full_dir> <out.json>`（fill/縁色/字高/中心座標）。白マスクは**黒フチ判定（周囲リング輝度<110）必須**（空・白車が混入する。ガード内蔵済み）
