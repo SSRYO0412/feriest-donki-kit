@@ -130,8 +130,23 @@ proj.createNewSequence("名前", "任意のID");   // ★既定プリセット =
 proj.openSequence(seq.sequenceID);             // プロジェクトとシーケンスを同時にアクティブ化
 ```
 
-★縦型（1080x1920）のシーケンスをスクリプトから作る方法は**未調査**。
-現状は横型で作り、MOGRT（1080x1920）は**フレーム中央に等倍で置かれる**（§3-5）。
+★★★**第2引数を空文字列 `""` にしてはいけない。**「新規シーケンス」ダイアログが開き、
+**人が OK を押すまでスクリプトが返らない**（無人で回すと必ずタイムアウトする）。
+ここに「任意のID」と書いてあるのが正しい。中身は見ていないので何でもよい。
+
+★**縦型（1080x1920）はスクリプトで作れる。** ただし**プリセットの内容は反映されない**
+（何を渡しても 1920x1080/23.976）ので、**作ってから `setSettings` で上書きする**のが唯一の道。
+
+```javascript
+proj.createNewSequence(name, "vops");         // ★空文字列にしない
+var st = seq.getSettings();
+st.videoFrameWidth = 1080; st.videoFrameHeight = 1920;
+var tk = new Time(); tk.ticks = "8467200000"; st.videoFrameRate = tk;   // 30fps
+st.videoPixelAspectRatio = "1:1";
+st.editingMode = "795454d9-d3c2-429d-9474-923ab13b7018";
+st.videoFieldType = 0;
+seq.setSettings(st);                           // 実測: 1080x1920 / ticks=8467200000 / V=3 A=4
+```
 
 ### 3-2. 背景を敷く（検証用）
 

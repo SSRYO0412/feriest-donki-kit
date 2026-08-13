@@ -43,7 +43,8 @@ function focusAway() {
 | シーケンス | `seq.name =` | 通る |
 | シーケンス | `getSettings()` | 1280x720 |
 | シーケンス | `exportAsFinalCutProXML(path)` | true |
-| シーケンス | `proj.createNewSequence(name, "")`（**空**） | 通る・**奪わない** |
+| シーケンス | `proj.createNewSequence(name, "")`（**空**） | **★ダイアログが開いて止まる**（人が OK を押すまで返らない） |
+| シーケンス | `proj.createNewSequence(name, "vops")`（**空でない文字列**） | 通る・**奪わない**・ダイアログ無し |
 | トラック | `track.setMute(1/0)` / `isMuted()` | 通る |
 | 素材 | `item.setScaleToFrameSize()` | 通る |
 | 素材 | `item.setInPoint` / `setOutPoint` / `getInPoint` / `getOutPoint` | 1.00-3.00 |
