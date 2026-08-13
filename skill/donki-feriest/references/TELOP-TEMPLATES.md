@@ -7,16 +7,41 @@
 
 ## どれを使うか
 
-| ファイル | 項目数 | グラデ | グロー | 影/下地 | 強調3スロット | 文字間隔 |
-|---|---|---|---|---|---|---|
-| `telop_3slot_v22.mogrt` | 本文＋49 | — | **○** | — | ○ | — |
-| `telop_v25_fontedit.mogrt` | 本文＋69 | **2色** | — | ○ | ○ | ○ |
-| `telop_v26_fontedit.mogrt` | 本文＋78 | **4色** | — | ○ | ○ | ○ |
-| **`telop_v27_fontedit.mogrt`** | **本文＋71** | **2色** | **○** | ○ | ○ | ○ |
-| **`telop_v28_fontedit.mogrt`** | **本文＋80** | **4色** | **○** | ○ | ○ | ○ |
+| ファイル | 項目数 | **素材長** | グラデ | グロー | 影/下地 | 強調3スロット | 文字間隔 |
+|---|---|---|---|---|---|---|---|
+| **`telop_v29_fontedit.mogrt`** | **本文＋71** | **60秒** | **2色** | **○** | ○ | ○ | ○ |
+| **`telop_v30_fontedit.mogrt`** | **本文＋80** | **60秒** | **4色** | **○** | ○ | ○ | ○ |
+| `telop_v27_fontedit.mogrt` | 本文＋71 | 5秒 | 2色 | ○ | ○ | ○ | ○ |
+| `telop_v28_fontedit.mogrt` | 本文＋80 | 5秒 | 4色 | ○ | ○ | ○ | ○ |
+| `telop_v25` / `telop_v26` | 69 / 78 | 5秒 | 2色 / 4色 | — | ○ | ○ | ○ |
+| `telop_3slot_v22.mogrt` | 本文＋49 | 5秒 | — | ○ | — | ○ | — |
 
-★**いろいろ試すなら v27（2色グラデ）か v28（4色グラデ）**。この2つが全部入り。
+★**迷ったら `telop_v29`。** 全部入りで、しかも**60秒まで伸ばせる**。4色グラデが要るときだけ v30。
 ★**v22 はこの案件で採用してきた版**。見た目を変えたくないカットはこれを使い続ける。
+
+### ★★★ 素材長（テロップの最大尺）
+
+**MOGRT の尺は「テンプレのコンプ長」で決まる。** `clip.end` でそれを超えて伸ばしても、
+**その先は描画されない**。しかも**読み戻しでは分からない**（クリップは伸びて見えるだけ）。
+気づけるのは**書き出した画素を見たとき**だけ。
+
+- **5秒版（v22〜v28）** … 150F を超えた分は出ない。長い区間は**複数枚を隙間なく敷き詰める**
+  （例: 337F = 0-150 / 150-300 / 300-337）
+- **60秒版（v29/v30）** … 1800F まで1枚で伸ばせる
+
+**使い方は「長いテンプレを入れて、必要な尺にトリムする」**。挿入時の既定クリップ長は
+コンプ長（60秒）になるので、**必ず `clip.end` で詰める**。
+
+```javascript
+var clip = seq.importMGT(MG, String(Math.round(sec * TPS)), vTrack, aTrack);
+var e = new Time(); e.seconds = 終了秒; clip.end = e;    // ★必ず詰める
+```
+
+★**書き出しで60秒ぶんレンダーされることはない。** レンダーされるのはタイムラインに
+乗っている尺だけで、コンプ長は「どこまで伸ばせるかの上限」でしかない。
+
+★**もっと長い尺が要るなら**、雛形（`templates/ae_build_telop_mogrt_v11.jsx`）の
+`DUR` を変えて作り直す（After Effects が要る）。**既にある `.mogrt` の尺は後から変えられない。**
 
 ---
 
@@ -152,6 +177,8 @@ function setByName(nm, v) {
 |---|---|
 | `telop_v27_fontedit.mogrt` | `ae_build_telop_mogrt_v9.jsx` |
 | `telop_v28_fontedit.mogrt` | `ae_build_telop_mogrt_v10.jsx` |
+| **`telop_v29_fontedit.mogrt`** | **`ae_build_telop_mogrt_v11.jsx`**（v9 の `DUR` を60秒にしたもの） |
+| **`telop_v30_fontedit.mogrt`** | **`ae_build_telop_mogrt_v12.jsx`**（v10 の60秒版） |
 
 ```bash
 AE_OUTDIR=~/Desktop/mogrt bash skills/premiere-bridge-ops/scripts/ae.sh \
