@@ -12,9 +12,9 @@ description: Premiere Pro をスクリプトから安定して自動操作する
 
 ---
 
-# ★★★ 絶対厳守（12条）
+# ★★★ 絶対厳守（14条）
 
-**この12条はすべて実機で事故った結果として書かれている。守らないと同じ事故が再発する。**
+**この14条はすべて実機で事故った結果として書かれている。守らないと同じ事故が再発する。**
 
 1. **戻り値と読み戻しだけで「できた」と報告しない。**
    **書き出した実ファイルの画素で測るまで完了と言わない。**
@@ -42,6 +42,13 @@ description: Premiere Pro をスクリプトから安定して自動操作する
 13. **MOGRT の素材長は 150F（5秒）。`clip.end` で超えて伸ばすと 150F 以降は描画されない。**
     しかも**読み戻しでは検出できない**（クリップは伸びて見える。書き出した画素で初めて分かる）。
     長い区間は**複数枚を隙間なく敷き詰める**（例: 337F = 0-150 / 150-300 / 300-337）。
+14. **★素材は切らずにトリムで入れる。** 元素材を秒数で切り出したファイルを作って置いてはならない。
+    **元素材を取り込み、`setInPoint`/`setOutPoint` を打ってから `overwriteClip` する**（§3-1）。
+    切り出すと**後から伸ばす自由が原理的に消え**、修正のたび ffmpeg へ戻ることになる。
+    トリムの検算に `outPoint` の読み戻しを使わない（**伸ばしても伸びない**）。尺は `end − start`。
+    **★in/out が素材尺を超えていないか投入前に ffprobe で確かめる。**
+    超えるとエラーもクランプもなく**超過分に完全な黒＋無音が焼き込まれ、機械検算もPASSする**。
+    横断原則は `_video-core/PRINCIPLES.md` §16。
 
 ---
 
@@ -84,6 +91,7 @@ description: Premiere Pro をスクリプトから安定して自動操作する
 | 開く前に | `list_projects.jsx` で **`documentID` の重複を確認**（重複したまま作業すると本番を編集する） |
 | 絶対にやらない | **`.prproj` のコピーを開く**（シーケンスが合流して汚染される・アンドゥも効かない） |
 | 複数本 | 編集は並行・**Premiereへの投入は直列キュー**（`prq.py`）・書き出しは**AMEキュー** |
+| 素材の入れ方 | **★切らずにトリム**。元素材を取り込み `setInPoint`/`setOutPoint`（**2引数・mediaType必須**）を打ってから置く。切り出しファイルを作らない（14条・§3-1） |
 | 配置 | **`overwriteClip`**（`insertClip` は後続を押し出す） |
 | クリップ有効無効 | **`clip.disabled`**（読み書き両方できる。`isDisabled()` は存在しない） |
 | キーフレーム | 時刻は **`clip.inPoint.seconds` 基準**（静止画は約3600秒） |
@@ -396,6 +404,66 @@ var NV = S.videoTracks.numTracks;   // シーケンスによって本数が違�
 
 ## 3-1. 配置・尺・削除の作法
 
+### ★★★ 素材は切らずにトリムで入れる（絶対厳守14条・2026-08-13 実機確立）
+
+**ffmpeg で `src_in`〜`src_out` を切り出した `c01.mp4` を作って置いてはいけない。**
+元素材1本を取り込み、**イン点/アウト点だけを打って置く**。前後がハンドルとして残るので、
+投入後に人が端を掴んで伸ばす・スリップするという**手直しの余地が保たれる**。
+切り出し方式はこれが原理的に不可能で、「あと0.3秒前から」の一言で ffmpeg からやり直しになる。
+
+```javascript
+function T(sec) { var t = new Time(); t.seconds = sec; return t; }
+function grid(sec) { return Math.round(sec * FPS) / FPS; }   // ★フレーム格子に乗せる
+
+for (var k = 0; k < CUTS.length; k++) {
+    var c = CUTS[k], item = items[k];
+    // ★setInPoint / setOutPoint は「2引数」。mediaType を省くと Not Enough Parameters で落ちる
+    item.setInPoint (T(grid(c.src_in )), 4);
+    item.setOutPoint(T(grid(c.src_out)), 4);
+    V.overwriteClip(item, T(grid(c.tl)));    // ★素材の in/out を尊重して置かれる
+}
+```
+
+**実測（合成素材3カット＋実写4K素材3カットで実証・2026-08-13）**:
+
+| 確かめたこと | 結果 |
+|---|---|
+| `overwriteClip` は素材の in/out を尊重するか | **する**。設計どおりのフレーム数で乗る |
+| リンク音声はどうなるか | **同区間で自動的に付く**（A1側を別途置く必要がない） |
+| 1フレーム過剰配置は起きるか | **フレーム格子に乗せれば起きない**（6カットとも厳密一致） |
+| 置いた後に `clip.end` で伸ばせるか | **伸びる。元の out 点より先の実フレームが本当に出る** |
+
+**検算の作法（ここを間違えると「効いていない」ことに気づけない）**:
+
+- **`inPoint`/`outPoint` の読み戻しでトリムを検算してはいけない。**
+  `clip.end` で伸ばしても `outPoint` は**元の値のまま**を返す（実測: tl 8-14＝6秒のクリップが
+  `src=5.0-9.0`＝4秒を返した）。§3-3 のキーフレーム事故と同じ「読み戻しでは検出できない」型
+- 尺は **`end − start`** で見る。最終判断は**書き出した実ファイルの画素**（§4）
+- 実写素材は焼き込みTCが無いので、**書き出しフレーム vs 元素材の該当フレームを SSIM で突合**する。
+  必ず**対照実験**を置く（「フリーズ仮説」「隣接フレーム」と比べる。実測でハンドル 0.951 に対し
+  フリーズ 0.465・別素材 0.287 と明確に割れた）。±5F を1F刻みでスキャンして
+  **0Fずれに単峰のピーク**が立てばフレーム厳密と言える
+
+**★★★ 素材尺を超える in/out を打ってはいけない（黙って黒が焼き込まれる）**
+
+60.0秒の素材に `in=55.0 / out=65.0` を打つと、**エラーにもクランプにもならず10秒のクリップが出来る**。
+そして書き出すと **5.000秒ちょうどから末尾まで完全な黒（音声も -47.8dB の無音）**。
+`setOutPoint` は成功し、読み戻しも `65.000` を返し、**配置の機械検算（クリップ数・`end−start`）も
+PASS する**。「検算は全部通ったのに完成品の後半が真っ黒」がこれで起きる（2026-08-13 実測）。
+
+**トリム範囲は生成の時点で ffprobe の実尺と突き合わせて落とす。**
+`place_premiere.py` の `guard_range()` が `src_out > 実尺` / `src_in < 0` / `src_out <= src_in`
+で中断する。手書きの jsx を投げるときも素材尺を確かめてから打つこと。
+
+**ハンドルの限界を先に計算する**: 伸ばせるのは素材の実尺までで、
+**`clip.start` に負の `Time` を代入するとスクリプトごと落ちる**（`ExtendScript execution failed`。
+エラーにすらならない）。伸ばす前に残ハンドル量でクランプすること。
+
+雛形は `templates/place_clip_trim.jsx`（cutlist をそのまま食える形）。
+生成は `_video-core/pipeline/scripts/place_premiere.py`。
+
+### その他の作法
+
 - ★**カットはフレーム格子に乗せる**（2026-08-09 実測）。設計秒をそのまま `Time.seconds` に
   入れるとカット間に**サブフレームの隙間**ができる。フレーム数で計算してから秒に戻す
 - ★**全トラックの終端を機械検算する**。1トラックだけ最終カットが 1F 短い穴は目視では
@@ -506,7 +574,7 @@ Premiere 26.3.2 で全数実測した（各操作の直前にフォーカスを�
 
 読み取り全般 / `overwriteClip` / `insertClip` / `clip.start=` / `clip.end=` /
 `clip.disabled=` / `clip.name=` / `remove()` / マーカー一式 / `setInPoint` / `setOutPoint` /
-`seq.name=` / `getSettings` / `exportAsFinalCutProXML` / `createNewSequence`（**第2引数は空にしない**） /
+`seq.name=` / `getSettings` / `exportAsFinalCutProXML` / `createNewSequence`（**第2引数は空にしない**・§3-1） /
 `track.setMute` / 素材の `setScaleToFrameSize`・`setInPoint`・`setOutPoint`・`getMarkers` /
 **キーフレーム一式**（`getValue`/`setValue`/`setTimeVarying`/`addKey`/`setValueAtKey`/`getValueAtKey`）/
 ネスト（`seq.projectItem` を置く）/ 選択（`setSelected`/`getSelection`）/
@@ -521,7 +589,7 @@ Premiere 26.3.2 で全数実測した（各操作の直前にフォーカスを�
 `createSubsequence` / `clone` / `deleteSequence`
 
 **「新しく作る」系が奪う**と覚えると外さない。例外: `createNewSequence` は奪わない。
-★ただし**第2引数を空文字列にするとダイアログが開いて止まる**（新規シーケンスを作るときは必ず空でない文字列を渡す）。
+★ただし**第2引数を空文字列にするとダイアログが開いて止まる**（2026-08-13 訂正・§3-1）。
 
 **C. 対象をアクティブにしないとできない（QE依存）**
 
@@ -669,6 +737,7 @@ var clip = sequence.importMGT(path, ticks, videoTrackOffset, audioTrackOffset);
 | `scripts/wait_render.sh` | **書き出し完了を待つ**。★**拡張子はプリセットのコンテナに上書きされる**（`.mp4`指定でも`.mov`）ので吸収する |
 | `scripts/ssim_check.sh` | **書き出した2本を画素で比べる**。`ffmpeg` の ssim/psnr を判定文つきで出す |
 | `scripts/mogrt_enable_font_edit.py` | **`.mogrt` のフォント編集を解禁**する。zip内 `definition.json` の `capPropFontEdit` 等を立てる。**AEにAPIが無いのでこれが唯一の道**。これで書体を焼き込む必要が無くなる |
+| **`scripts/mogrt_scrub.py`** | **`.mogrt` から作者マシンの絶対パスを消す（配布前の必須処理）**。AEは同梱サムネ `thumb.mp4` のXMPに生成元 `.aep` のフルパスを残す。`distcheck` はテキストしか見ないので**素通りする**。mp4のボックス長を壊さないよう**同じバイト長の中立文字列で埋める** |
 | `scripts/ae.sh` | **AE に `.jsx` を投げる**（AppleScript直・ブリッジ不要）。`log()` 注入・ダイアログ抑止・改行正規化 |
 | `scripts/aecheck.sh` | AE の生存確認。**`get version` は当てにならない**ので実際にファイルを書かせて判定 |
 | `scripts/prq.py` | **直列ジョブキュー**。投入順保証・`documentID` 注入・禁止語の事前検出・タイムアウトで停止 |
@@ -682,6 +751,8 @@ var clip = sequence.importMGT(path, ticks, videoTrackOffset, audioTrackOffset);
 | `templates/ae_build_telop_mogrt.jsx` | **AE用**。本文/書体/サイズ/文字色/縁の太さ/縁の色/グローを Premiereから変えられるテロップMOGRTを作る雛形。`bash scripts/ae.sh` で投げる |
 | `templates/pr_place_mogrt.jsx` | **Premiere用**。MOGRTを置いてパラメータを流し込む定型。ticksの文字列渡し・3点照合・ドロップダウンの−1・**本文の配列長の検算**・モーション位置まで畳み込み済み |
 | `templates/ae_measure_text.jsx` | **AE用**。AEを**文字幅の計算機**として使う。1行を複数クリップに分けて横に並べるときの配置座標を出す（両端合わせ・正規化位置まで計算）。SSIM 0.9997 で再現を実証済み |
+| **`templates/ae_build_telop_mogrt_v7.jsx`** | **AE用・統合版（v25）**。v24の影/下地/重心アンカー＋v22の強調3スロット＋**文字色グラデ（2色）**＋**文字間隔**。本文＋69項目。グラデはテキストをアルファマットにしてグラデソリッドを抜く方式（マットは本文の複製・影とフチは外す）。グラデと強調色は排他。効き0で単色に戻る |
+| **`templates/ae_build_telop_mogrt_v8.jsx`** | **AE用・4色グラデ版（v26）**。v25 の2色グラデを `ADBE 4ColorGradient`（4点×4色を自由配置）に差し替え。本文＋78項目。**5色以上の多段ストップは原理的に不可** |
 | `templates/ae_build_telop_mogrt_v4.jsx` | **AE用・現行の推奨版**。v3のカラーピッカーを全廃し、色を**0〜100の数値スライダー3本**で持つ。本文＋49項目 |
 | `templates/ae_build_telop_mogrt_v3.jsx` | **AE用・現行の推奨版**。テキストレイヤー1枚で、書体はPremiereから任意指定（`mogrt_enable_font_edit.py` を通す前提）。強調3スロット独立。本文＋33項目（強調は色/大きさ/縁の色/縁の太さ/縦オフセット）。v2の5レイヤー・式75件に対し**1レイヤー・式31件** |
 | `templates/ae_build_telop_mogrt_v2.jsx` | **AE用**。上記に**出現アニメ5種**（なし/フェード/ポップ/下からスライド/タイプライター）、**部分強調**（何文字目から何文字目・色・大きさ）、**強調モーション**（なし/後から跳ねる/後から色が乗る/跳ねて色も乗る・遅れ）を足した版。計16項目 |
@@ -691,7 +762,9 @@ var clip = sequence.importMGT(path, ticks, videoTrackOffset, audioTrackOffset);
 | `references/UI-EQUIV.md` | **UI操作↔スクリプトの対応表**。現行パネル構成(25.0でプロパティへ移動)・できない4つ(マスク/順序/プリセット/調整レイヤー)と回避策・エフェクト複製の実装・実測した演出レシピ |
 | `references/MOGRT.md` | **MOGRT の全知見**。挿入・本文/書体/サイズ/色の変更・部分強調（複数ラン）・配列長を揃えないと落ちる・欠けは幅が原因・レンジセレクター設計 |
 | `references/AE-MOGRT-BUILD.md` | **AE側でMOGRTを作る全知見**。AE接続6つの罠・EGPに出せる型と「範囲を編集」・書体切替の設計・フチはアニメーター線幅・フォント実在確認・参照が無効化される2操作 |
-| **`assets/telop_3slot_v22.mogrt`** | **★現行の推奨。すぐ使えるMOGRT本体**。本文＋49項目・1レイヤー・フォント編集解禁済み・**色も0〜100の数値で指定できる**（スクリプト運用向け） |
+| **`assets/telop_v25_fontedit.mogrt`** | **★グラデ／文字間隔が要るならこれ**。本文＋69項目（v24の影・下地＋強調3スロット＋2色グラデ＋文字間隔）。フォント編集解禁済み |
+| `assets/telop_v26_fontedit.mogrt` | 上記の**4色グラデ版**。本文＋78項目。2色で出せない虹系・ネオン系のとき |
+| **`assets/telop_3slot_v22.mogrt`** | **★強調スロット中心ならこれ。すぐ使えるMOGRT本体**。本文＋49項目・1レイヤー・フォント編集解禁済み・**色も0〜100の数値で指定できる**（スクリプト運用向け） |
 | `assets/telop_3slot_v20.mogrt` | 同上の**カラーピッカー版**（本文＋33項目）。**人がUIで色を選ぶ**運用向け。色はスクリプトから設定できない |
 | `assets/telop_fontbaked_v14.mogrt` | 書体5種を焼き込んだ版（本文＋8項目）。人がUIで書体を選ぶ運用向け |
 | `assets/README.md` | 同梱MOGRTの項目一覧と使うときの注意 |

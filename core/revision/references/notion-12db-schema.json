@@ -1,0 +1,1101 @@
+{
+  "_note": "映像管理 Notion 12DB の schema-as-code（DISTRIBUTION.md §4・2026-08-10 新設）。notion-db-contract.md §3/§9 が唯一の規範で、この JSON はその機械可読ミラー。食い違いは契約が勝ち、気づいた者がこのファイルを契約に合わせて直す。notion_bootstrap.py がこれを読んで自ワークスペースに DB を生成する（<YOUR_ORG> テンプレ複製への依存を外す配布対応）。",
+  "version": "2026-08-11",
+  "scope_note": "scope=project: 案件ハブページ直下に1式。scope=per-video: 動画ごとに別ページを作り、その中に生成する（契約 §10-2。1つのDBに複数動画を混ぜない）。per-video DB名には video_id を接頭辞で付ける。 optional_feature を持つDBは、そのライセンス機能が有効なとき（--with-rules 指定時）のみ作成する。",
+  "views_note": "REST API はビューを作成できない。§10-1 の時系列ビュー（デフォルトビュー含む）は MCP の create_view/update_view か UI で設定し、設定後に実クエリで『先頭が0秒・末尾が最終行』を検証してから完了と言う。",
+  "databases": {
+    "project_ledger": {
+      "name": "プロジェクト台帳",
+      "scope": "project",
+      "description": "案件1行。納品ゲート結果は notion_gate.py がスタンプ（手打ち禁止）",
+      "title_prop": "プロジェクト名",
+      "properties": {
+        "クライアント": {
+          "rich_text": {}
+        },
+        "ステータス": {
+          "select": {
+            "options": [
+              {
+                "name": "進行中"
+              },
+              {
+                "name": "納品済み"
+              },
+              {
+                "name": "アーカイブ"
+              }
+            ]
+          }
+        },
+        "案件フォルダ": {
+          "rich_text": {}
+        },
+        "納品フォルダ": {
+          "rich_text": {}
+        },
+        "共通ルール": {
+          "rich_text": {}
+        },
+        "納品ゲート結果": {
+          "rich_text": {}
+        }
+      },
+      "relations": []
+    },
+    "video_ledger": {
+      "name": "動画台帳",
+      "scope": "project",
+      "description": "納品物レジストリ。採用の中身はレンダーDBが正本。◆派生列（採用サマリ/最終v/採用MP4パス/採用pyパス/整合）は autolink が生成する鏡＝手打ち禁止",
+      "title_prop": "動画名",
+      "properties": {
+        "video_id": {
+          "rich_text": {}
+        },
+        "動画番号": {
+          "rich_text": {}
+        },
+        "ステータス": {
+          "select": {
+            "options": [
+              {
+                "name": "制作中"
+              },
+              {
+                "name": "修正中"
+              },
+              {
+                "name": "納品済み"
+              },
+              {
+                "name": "アーカイブ"
+              }
+            ]
+          }
+        },
+        "採用サマリ": {
+          "rich_text": {}
+        },
+        "最終v": {
+          "number": {}
+        },
+        "採用MP4パス": {
+          "rich_text": {}
+        },
+        "採用pyパス": {
+          "rich_text": {}
+        },
+        "整合": {
+          "select": {
+            "options": [
+              {
+                "name": "OK"
+              },
+              {
+                "name": "不整合"
+              },
+              {
+                "name": "未リンク"
+              }
+            ]
+          }
+        },
+        "残課題": {
+          "rich_text": {}
+        },
+        "納品フォルダ": {
+          "rich_text": {}
+        },
+        "最終更新": {
+          "last_edited_time": {}
+        }
+      },
+      "relations": [
+        {
+          "prop": "採用レンダー",
+          "target": "render_db"
+        }
+      ]
+    },
+    "render_db": {
+      "name": "レンダーpy管理DB",
+      "scope": "project",
+      "description": "バージョン履歴の正本。1レンダー=1行、却下版も必ず行にする（notion_log_render.py が機械起票）",
+      "title_prop": "レンダー名",
+      "properties": {
+        "render_key": {
+          "rich_text": {}
+        },
+        "video_id": {
+          "rich_text": {}
+        },
+        "v": {
+          "number": {}
+        },
+        "バリアント": {
+          "select": {
+            "options": [
+              {
+                "name": "なし"
+              },
+              {
+                "name": "A_顔あり"
+              },
+              {
+                "name": "B_顔なし"
+              }
+            ]
+          }
+        },
+        "採用状態": {
+          "select": {
+            "options": [
+              {
+                "name": "採用"
+              },
+              {
+                "name": "却下"
+              },
+              {
+                "name": "旧採用"
+              },
+              {
+                "name": "未判定"
+              }
+            ]
+          }
+        },
+        "却下理由": {
+          "rich_text": {}
+        },
+        "根拠": {
+          "rich_text": {}
+        },
+        "判定日": {
+          "date": {}
+        },
+        "pyパス": {
+          "rich_text": {}
+        },
+        "MP4パス": {
+          "rich_text": {}
+        },
+        "中間素材パス": {
+          "rich_text": {}
+        },
+        "音声ソース": {
+          "rich_text": {}
+        },
+        "BGMソース": {
+          "rich_text": {}
+        },
+        "出力日時": {
+          "date": {}
+        }
+      },
+      "relations": [
+        {
+          "prop": "動画",
+          "target": "video_ledger"
+        },
+        {
+          "prop": "修正指示",
+          "target": "revision_request_db"
+        }
+      ]
+    },
+    "revision_request_db": {
+      "name": "修正指示DB",
+      "scope": "project",
+      "description": "動画単位の修正依頼と供給ギャップ（素材不足・次回撮影申し送り）の起票先。行の削除禁止＝履歴",
+      "title_prop": "指示タイトル",
+      "properties": {
+        "対象video_id": {
+          "rich_text": {}
+        },
+        "全動画対象": {
+          "checkbox": {}
+        },
+        "ステータス": {
+          "select": {
+            "options": [
+              {
+                "name": "新規"
+              },
+              {
+                "name": "確認中"
+              },
+              {
+                "name": "設計済み"
+              },
+              {
+                "name": "作業中"
+              },
+              {
+                "name": "レンダー済み"
+              },
+              {
+                "name": "検品中"
+              },
+              {
+                "name": "修正完了"
+              },
+              {
+                "name": "納品済み"
+              },
+              {
+                "name": "却下"
+              },
+              {
+                "name": "保留"
+              }
+            ]
+          }
+        },
+        "修正種別": {
+          "multi_select": {
+            "options": []
+          }
+        },
+        "優先度": {
+          "select": {
+            "options": [
+              {
+                "name": "高"
+              },
+              {
+                "name": "中"
+              },
+              {
+                "name": "低"
+              }
+            ]
+          }
+        },
+        "対象cut id": {
+          "rich_text": {}
+        },
+        "対象秒数": {
+          "rich_text": {}
+        },
+        "指示内容": {
+          "rich_text": {}
+        },
+        "対応方針": {
+          "rich_text": {}
+        },
+        "対応後メモ": {
+          "rich_text": {}
+        },
+        "検品結果": {
+          "rich_text": {}
+        },
+        "受付日": {
+          "date": {}
+        },
+        "完了日": {
+          "date": {}
+        }
+      },
+      "relations": [
+        {
+          "prop": "動画",
+          "target": "video_ledger"
+        }
+      ]
+    },
+    "qa_log_db": {
+      "name": "QAログDB",
+      "scope": "project",
+      "description": "検品証跡。数値列は §9 の3軸/突合（short-video-qc 合議採点）",
+      "title_prop": "QA名",
+      "properties": {
+        "video_id": {
+          "rich_text": {}
+        },
+        "render_key": {
+          "rich_text": {}
+        },
+        "QA種別": {
+          "multi_select": {
+            "options": []
+          }
+        },
+        "結果": {
+          "select": {
+            "options": [
+              {
+                "name": "OK"
+              },
+              {
+                "name": "NG"
+              },
+              {
+                "name": "条件付きOK"
+              }
+            ]
+          }
+        },
+        "確認内容": {
+          "rich_text": {}
+        },
+        "対象秒数": {
+          "rich_text": {}
+        },
+        "証跡パス": {
+          "rich_text": {}
+        },
+        "確認日": {
+          "date": {}
+        },
+        "軸1_最低スロット点": {
+          "number": {}
+        },
+        "軸2_FidelityIndex": {
+          "number": {}
+        },
+        "軸2_肝遵守": {
+          "number": {}
+        },
+        "軸2_盲検AB識別率": {
+          "number": {}
+        },
+        "軸3_ゲート違反数": {
+          "number": {}
+        },
+        "軸3_Codex評点": {
+          "number": {}
+        },
+        "突合ゲート結果": {
+          "rich_text": {}
+        }
+      },
+      "relations": [
+        {
+          "prop": "動画",
+          "target": "video_ledger"
+        },
+        {
+          "prop": "修正指示",
+          "target": "revision_request_db"
+        },
+        {
+          "prop": "レンダー",
+          "target": "render_db"
+        }
+      ]
+    },
+    "asset_db": {
+      "name": "素材DB",
+      "scope": "project",
+      "description": "編集制約台帳（窓粒度: 1素材×時間窓=1行）。カタログ（SQLite正本）と混同しない（契約§7）。confirmed_by が付いた窓のみ転記",
+      "title_prop": "素材名",
+      "properties": {
+        "素材rel": {
+          "rich_text": {}
+        },
+        "種類": {
+          "rich_text": {}
+        },
+        "顔ルール": {
+          "rich_text": {}
+        },
+        "音声BGM状態": {
+          "rich_text": {}
+        },
+        "使える秒数": {
+          "rich_text": {}
+        },
+        "禁止秒数": {
+          "rich_text": {}
+        },
+        "verdict要約": {
+          "rich_text": {}
+        },
+        "t0秒": {
+          "number": {}
+        },
+        "t1秒": {
+          "number": {}
+        },
+        "verdict": {
+          "rich_text": {}
+        },
+        "使用条件": {
+          "rich_text": {}
+        },
+        "判定理由": {
+          "rich_text": {}
+        },
+        "確定者": {
+          "rich_text": {}
+        },
+        "clip_kind": {
+          "rich_text": {}
+        },
+        "sim_cluster": {
+          "rich_text": {}
+        },
+        "カタログ正本パス": {
+          "rich_text": {}
+        },
+        "回": {
+          "rich_text": {}
+        }
+      },
+      "relations": []
+    },
+    "asset_use_db": {
+      "name": "素材使用DB",
+      "scope": "project",
+      "description": "カット×素材の使用記録。参照してよいのは編集制約台帳のみ（カタログ直参照は監査FAIL）",
+      "title_prop": "記録名",
+      "properties": {
+        "cut_key": {
+          "rich_text": {}
+        },
+        "video_id": {
+          "rich_text": {}
+        },
+        "使用素材rel": {
+          "rich_text": {}
+        },
+        "使用意図": {
+          "rich_text": {}
+        },
+        "台本との関係": {
+          "rich_text": {}
+        },
+        "注意・禁止": {
+          "rich_text": {}
+        }
+      },
+      "relations": [
+        {
+          "prop": "動画",
+          "target": "video_ledger"
+        },
+        {
+          "prop": "カット",
+          "target": "cut_ledger"
+        },
+        {
+          "prop": "素材",
+          "target": "asset_db"
+        }
+      ]
+    },
+    "schedule_db": {
+      "name": "工程・スケジュールDB",
+      "scope": "project",
+      "description": "工程[0]〜[9]と停止点（align/sheet/watch）の進捗",
+      "title_prop": "工程名",
+      "properties": {
+        "video_id": {
+          "rich_text": {}
+        },
+        "順序": {
+          "number": {}
+        },
+        "区分": {
+          "select": {
+            "options": [
+              {
+                "name": "工程"
+              },
+              {
+                "name": "停止点"
+              }
+            ]
+          }
+        },
+        "担当": {
+          "rich_text": {}
+        },
+        "ステータス": {
+          "select": {
+            "options": [
+              {
+                "name": "未着手"
+              },
+              {
+                "name": "進行中"
+              },
+              {
+                "name": "完了"
+              },
+              {
+                "name": "停止点待ち"
+              }
+            ]
+          }
+        },
+        "予定日": {
+          "date": {}
+        },
+        "実績日": {
+          "date": {}
+        },
+        "成果物パス": {
+          "rich_text": {}
+        },
+        "ゲート結果": {
+          "rich_text": {}
+        },
+        "依存工程": {
+          "rich_text": {}
+        }
+      },
+      "relations": []
+    },
+    "cut_ledger": {
+      "name": "カット台帳",
+      "scope": "per-video",
+      "description": "cut_key のレジストリ・編集後の制作記録（修正指示の受付は修正台帳が担う。役割を混ぜない）",
+      "title_prop": "カット名",
+      "properties": {
+        "cut_key": {
+          "rich_text": {}
+        },
+        "video_id": {
+          "rich_text": {}
+        },
+        "開始秒": {
+          "number": {}
+        },
+        "終了秒": {
+          "number": {}
+        },
+        "尺": {
+          "number": {}
+        },
+        "テロップ文言": {
+          "rich_text": {}
+        },
+        "素材tin": {
+          "number": {}
+        },
+        "意図": {
+          "rich_text": {}
+        },
+        "顔・クロップ方針": {
+          "rich_text": {}
+        }
+      },
+      "relations": [
+        {
+          "prop": "動画",
+          "target": "video_ledger"
+        },
+        {
+          "prop": "素材",
+          "target": "asset_db"
+        }
+      ]
+    },
+    "revision_ledger": {
+      "name": "修正台帳",
+      "scope": "per-video",
+      "description": "修正指示の受付窓口・案件で最も重要な成果物（1カット=1行）。設計・運用の正本は REVISION-LEDGER.md。必須4列=修正指示/採否/テロップ文言/動画内開始秒",
+      "title_prop": "カット名",
+      "properties": {
+        "cut_key": {
+          "rich_text": {}
+        },
+        "video_id": {
+          "rich_text": {}
+        },
+        "cut id": {
+          "rich_text": {}
+        },
+        "修正指示": {
+          "rich_text": {}
+        },
+        "採否": {
+          "select": {
+            "options": [
+              {
+                "name": "採用"
+              },
+              {
+                "name": "修正"
+              },
+              {
+                "name": "DROP"
+              },
+              {
+                "name": "HOLD"
+              }
+            ]
+          }
+        },
+        "テロップ文言": {
+          "rich_text": {}
+        },
+        "動画内開始秒": {
+          "number": {}
+        },
+        "動画内終了秒": {
+          "number": {}
+        },
+        "尺": {
+          "number": {}
+        },
+        "台本/VO文言": {
+          "rich_text": {}
+        },
+        "コンテカテゴリ": {
+          "rich_text": {}
+        },
+        "使用意図": {
+          "rich_text": {}
+        },
+        "ステータス": {
+          "select": {
+            "options": [
+              {
+                "name": "未確認"
+              },
+              {
+                "name": "確認済み"
+              },
+              {
+                "name": "要修正"
+              },
+              {
+                "name": "対応中"
+              },
+              {
+                "name": "修正済み"
+              },
+              {
+                "name": "却下"
+              }
+            ]
+          }
+        },
+        "初回採否": {
+          "select": {
+            "options": [
+              {
+                "name": "採用"
+              },
+              {
+                "name": "修正"
+              },
+              {
+                "name": "DROP"
+              },
+              {
+                "name": "HOLD"
+              }
+            ]
+          }
+        },
+        "変更区分": {
+          "select": {
+            "options": [
+              {
+                "name": "新規"
+              },
+              {
+                "name": "差し替え"
+              },
+              {
+                "name": "追加採用"
+              },
+              {
+                "name": "採用取消"
+              },
+              {
+                "name": "保留化"
+              },
+              {
+                "name": "置かないへ変更"
+              },
+              {
+                "name": "修正指定"
+              },
+              {
+                "name": "修正から復帰"
+              },
+              {
+                "name": "再DROP"
+              }
+            ]
+          }
+        },
+        "変更履歴": {
+          "rich_text": {}
+        },
+        "DROP理由": {
+          "rich_text": {}
+        },
+        "却下理由": {
+          "rich_text": {}
+        },
+        "修正日": {
+          "date": {}
+        },
+        "選定版": {
+          "rich_text": {}
+        },
+        "使用素材名": {
+          "rich_text": {}
+        },
+        "素材内開始秒 tin": {
+          "number": {}
+        },
+        "素材内終了秒 tout": {
+          "number": {}
+        },
+        "スケール": {
+          "number": {}
+        },
+        "モーション": {
+          "rich_text": {}
+        },
+        "人物判定": {
+          "select": {
+            "options": [
+              {
+                "name": "demo"
+              },
+              {
+                "name": "pass"
+              },
+              {
+                "name": "edge"
+              },
+              {
+                "name": "none"
+              }
+            ]
+          }
+        },
+        "クロップ指定": {
+          "rich_text": {}
+        },
+        "顔あり/顔なし指定": {
+          "select": {
+            "options": [
+              {
+                "name": "顔あり"
+              },
+              {
+                "name": "顔なし"
+              },
+              {
+                "name": "指定なし"
+              }
+            ]
+          }
+        },
+        "BGM/SEメモ": {
+          "rich_text": {}
+        },
+        "注意事項": {
+          "rich_text": {}
+        }
+      },
+      "relations": []
+    },
+    "telop_check_db": {
+      "name": "テロップチェックDB",
+      "scope": "per-video",
+      "description": "行単位のテロップ検品（話速・音量・フラグ）",
+      "title_prop": "行テキスト",
+      "properties": {
+        "video_id": {
+          "rich_text": {}
+        },
+        "行No": {
+          "number": {}
+        },
+        "cut id": {
+          "rich_text": {}
+        },
+        "文字数(スペース除く)": {
+          "number": {}
+        },
+        "表示秒数": {
+          "number": {}
+        },
+        "字/秒": {
+          "number": {}
+        },
+        "音量RMS実測": {
+          "number": {}
+        },
+        "フラグ": {
+          "multi_select": {
+            "options": [
+              {
+                "name": "早い"
+              },
+              {
+                "name": "遅い"
+              },
+              {
+                "name": "大きい"
+              },
+              {
+                "name": "小さい"
+              }
+            ]
+          }
+        },
+        "ステータス": {
+          "select": {
+            "options": [
+              {
+                "name": "未確認"
+              },
+              {
+                "name": "修正対象"
+              },
+              {
+                "name": "修正中"
+              },
+              {
+                "name": "修正済み"
+              },
+              {
+                "name": "承認済み"
+              }
+            ]
+          }
+        },
+        "元py": {
+          "rich_text": {}
+        },
+        "採用v": {
+          "number": {}
+        },
+        "修正メモ": {
+          "rich_text": {}
+        },
+        "最終更新": {
+          "last_edited_time": {}
+        }
+      },
+      "relations": [
+        {
+          "prop": "動画",
+          "target": "video_ledger"
+        }
+      ]
+    },
+    "script_db": {
+      "name": "台本DB",
+      "scope": "per-video",
+      "description": "1行=1台本行（編集前の上流。カット台帳は編集後）。DROP行も理由付きで残す。ローカル正本=work/script.json",
+      "title_prop": "発話",
+      "properties": {
+        "行ID": {
+          "rich_text": {}
+        },
+        "video_id": {
+          "rich_text": {}
+        },
+        "台本v": {
+          "number": {}
+        },
+        "機能": {
+          "rich_text": {}
+        },
+        "画_視覚指定": {
+          "rich_text": {}
+        },
+        "src_block": {
+          "rich_text": {}
+        },
+        "src範囲": {
+          "rich_text": {}
+        },
+        "開始秒": {
+          "number": {}
+        },
+        "尺予算_秒": {
+          "number": {}
+        },
+        "予測尺_秒": {
+          "number": {}
+        },
+        "モーラ": {
+          "number": {}
+        },
+        "絵変わり点": {
+          "rich_text": {}
+        },
+        "SE設計": {
+          "rich_text": {}
+        },
+        "情緒_ループ": {
+          "rich_text": {}
+        },
+        "圧縮指定": {
+          "rich_text": {}
+        },
+        "パンチイン": {
+          "rich_text": {}
+        },
+        "採否": {
+          "select": {
+            "options": [
+              {
+                "name": "採用"
+              },
+              {
+                "name": "修正"
+              },
+              {
+                "name": "DROP"
+              },
+              {
+                "name": "HOLD"
+              }
+            ]
+          }
+        },
+        "DROP理由": {
+          "rich_text": {}
+        },
+        "備考": {
+          "rich_text": {}
+        },
+        "修正指示": {
+          "rich_text": {}
+        },
+        "修正ステータス": {
+          "select": {
+            "options": [
+              {
+                "name": "未対応"
+              },
+              {
+                "name": "対応中"
+              },
+              {
+                "name": "対応済み"
+              },
+              {
+                "name": "却下"
+              }
+            ]
+          }
+        },
+        "修正日": {
+          "date": {}
+        },
+        "変更区分": {
+          "select": {
+            "options": [
+              {
+                "name": "追加採用"
+              },
+              {
+                "name": "採用取消"
+              },
+              {
+                "name": "保留化"
+              },
+              {
+                "name": "修正指定"
+              },
+              {
+                "name": "修正から復帰"
+              },
+              {
+                "name": "再DROP"
+              }
+            ]
+          }
+        },
+        "変更履歴": {
+          "rich_text": {}
+        },
+        "初回採否": {
+          "select": {
+            "options": [
+              {
+                "name": "採用"
+              },
+              {
+                "name": "修正"
+              },
+              {
+                "name": "DROP"
+              },
+              {
+                "name": "HOLD"
+              }
+            ]
+          }
+        }
+      },
+      "relations": []
+    },
+    "project_rules_db": {
+      "name": "案件ルールDB",
+      "scope": "project",
+      "optional_feature": "rules",
+      "description": "案件固有ルールの台帳（正本はローカル rules.jsonl・ここは人が見る/承認する鏡。一方向同期でNotion側編集は警告のみ=契約§2の派生列と同じ思想）。rules機能が有効なライセンスのときのみ作成",
+      "title_prop": "ルール本文",
+      "properties": {
+        "rule_key": {
+          "rich_text": {}
+        },
+        "工程": {
+          "select": {
+            "options": [
+              {
+                "name": "カット選定"
+              },
+              {
+                "name": "テロップ"
+              },
+              {
+                "name": "音声"
+              },
+              {
+                "name": "検品"
+              },
+              {
+                "name": "素材"
+              },
+              {
+                "name": "納品"
+              },
+              {
+                "name": "その他"
+              }
+            ]
+          }
+        },
+        "理由": {
+          "rich_text": {}
+        },
+        "出典": {
+          "rich_text": {}
+        },
+        "追加日": {
+          "date": {}
+        },
+        "状態": {
+          "select": {
+            "options": [
+              {
+                "name": "有効"
+              },
+              {
+                "name": "廃止"
+              }
+            ]
+          }
+        }
+      },
+      "relations": []
+    }
+  }
+}
