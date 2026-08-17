@@ -1,5 +1,25 @@
 # feriest-donki-kit
 
+> # ★★ 2026-08-17 凍結（FROZEN）
+>
+> **このリポジトリは更新しません。読むのは履歴としてだけ。**
+> 現行の正本は **VOPS 台帳（vops-daicho）と配布物** に移しました。
+>
+> | 探しているもの | 今どこにあるか |
+> |---|---|
+> | `core/` `skills/` | ★**ここのは古い写し。読まないこと。** 最新は配布物（`vops update`）と台帳の `docs_list` / `docs_get` / `skill_*` |
+> | 案件の手引き・設計JSON・検品の校正データ | 台帳 `doc_db` の `kit--INDEX` から辿る |
+> | `skill/donki-feriest` | 台帳 `doc_db` の `skill-donki-feriest--INDEX`／実体は `~/video-ops-support/donki-feriest/` |
+> | `skill/audio-emotion-voice-clone` | 台帳 `doc_db` の `skill-audio-emotion-voice-clone--*` |
+> | 素材DB・窓 | 台帳 `asset_db`（3,762窓・裁定済み） |
+> | `work/jsx_*`・参考prproj/MP4・baseline.mov | **ここにしか無い**（台帳に載せていない。要るときはここから取り出す） |
+>
+> ★**凍結した理由**: `core/` がフォーク時点の写しのままで、その後 framework に入った変更
+> （裁定方針・台帳HTTP契約・`ledger_query` の絞り込み）が反映されていない。
+> 生かしておくと**古い正本が2つある状態**になり、どちらを読むかで事故る。
+>
+> 入口は台帳の `skill_db`（`donki-feriest` / `audio-emotion-voice-clone` / `feriest-donki-kit`）。
+
 > ★**本キットはトライアル実演・評価のための限定提供です。利用条件は [LICENSE.md](LICENSE.md) を先に読んでください**
 > （本案件以外への流用・第三者提供・再配布は禁止です）。
 
